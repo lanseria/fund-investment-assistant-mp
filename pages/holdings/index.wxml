@@ -1,0 +1,92 @@
+<view class="min-h-screen bg-gray-50 pb-10">
+  <!-- 1. 资产概览卡片 (搬运自 PortfolioSummaryCard.vue) -->
+  <view class="p-4">
+    <view class="bg-primary rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
+      <!-- 装饰背景 -->
+      <view class="absolute -right-10 -top-10 w-40 h-40 bg-white opacity-10 rounded-full"></view>
+
+      <view class="text-sm opacity-80 mb-1">总市值 (元)</view>
+      <view class="text-4xl font-bold font-mono mb-6">{{ summary.totalEstimateAmount || '0.00' }}</view>
+
+      <van-row>
+        <van-col span="12">
+          <view class="text-xs opacity-80">当日盈亏</view>
+          <view class="text-lg font-bold">{{ summary.totalProfitLoss >= 0 ? '+' : '' }}{{ summary.totalProfitLoss ||
+            '0.00' }}</view>
+        </van-col>
+        <van-col span="12">
+          <view class="text-xs opacity-80">收益率</view>
+          <view class="text-lg font-bold">{{ summary.totalPercentageChange || '0.00' }}%</view>
+        </van-col>
+      </van-row>
+    </view>
+  </view>
+
+  <!-- 2. 行情简报 (搬运自 MarketOverview.vue) -->
+  <view class="px-4 mb-4">
+    <scroll-view scroll-x class="whitespace-nowrap w-full">
+      <view class="inline-flex gap-3">
+        <view wx:for="{{ indices }}" wx:key="code" class="bg-white p-3 rounded-xl shadow-sm min-w-100px">
+          <view class="text-xs text-gray-500">{{ item.name }}</view>
+          <view class="text-sm font-bold {{ item.changeRate >= 0 ? 'text-red-500' : 'text-green-500' }}">
+            {{ item.value }}
+          </view>
+          <view class="text-10px {{ item.changeRate >= 0 ? 'text-red-400' : 'text-green-400' }}">
+            {{ item.changeRate }}%
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 3. 持仓列表头部 -->
+  <view class="px-4 flex justify-between items-center mb-2">
+    <view class="text-lg font-bold text-gray-800">我的持仓 ({{ holdings.length }})</view>
+    <view class="flex gap-4">
+      <van-icon name="filter-o" size="20px" color="#646566" bind:click="toggleFilter" />
+      <van-icon name="add-o" size="20px" color="#0d9488" bind:click="onAddFund" />
+    </view>
+  </view>
+
+  <!-- 4. 持仓列表内容 -->
+  <view class="px-4 space-y-3">
+    <view wx:for="{{ holdings }}" wx:key="code" class="bg-white rounded-2xl p-4 shadow-sm" bindtap="toDetail"
+      data-code="{{ item.code }}">
+      <view class="flex justify-between items-start mb-2">
+        <view>
+          <view class="font-bold text-gray-800">{{ item.name }}</view>
+          <view class="text-xs text-gray-400">{{ item.code }}</view>
+        </view>
+        <view class="text-right">
+          <view class="text-sm font-bold {{ item.percentageChange >= 0 ? 'text-red-500' : 'text-green-500' }}">
+            {{ item.percentageChange >= 0 ? '+' : '' }}{{ item.percentageChange }}%
+          </view>
+          <view class="text-10px text-gray-400">当日涨跌</view>
+        </view>
+      </view>
+
+      <view class="flex justify-between border-t border-gray-50 pt-3 mt-2">
+        <view>
+          <view class="text-xs text-gray-400">市值</view>
+          <view class="text-sm font-medium">{{ item.holdingAmount || '-' }}</view>
+        </view>
+        <view class="text-center">
+          <view class="text-xs text-gray-400">收益</view>
+          <view class="text-sm font-medium {{ item.holdingProfitAmount >= 0 ? 'text-red-500' : 'text-green-500' }}">
+            {{ item.holdingProfitAmount || '0' }}
+          </view>
+        </view>
+        <view class="text-right">
+          <view class="text-xs text-gray-400">策略</view>
+          <view class="flex gap-1 justify-end">
+            <view wx:if="{{ item.signals.rsi }}" class="text-10px px-1 rounded bg-red-100 text-red-600">{{
+              item.signals.rsi }}</view>
+            <view wx:else class="text-10px px-1 rounded bg-gray-100 text-gray-400">持币</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <van-toast id="van-toast" />
+</view>

@@ -1,6 +1,0 @@
-// index.js
-
-Page({
-  data: {
-  },
-})

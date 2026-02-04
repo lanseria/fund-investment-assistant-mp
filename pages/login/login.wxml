@@ -1,0 +1,36 @@
+<view class="min-h-screen bg-gray-50 flex flex-col items-center p-6">
+  <!-- Logo 区域 -->
+  <view class="mt-20 mb-10 flex flex-col items-center">
+    <view class="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center shadow-lg">
+      <van-icon name="finance-asset" color="#ffffff" size="40px" />
+    </view>
+    <view class="mt-4 text-2xl font-bold text-gray-800">基金投资助手</view>
+    <view class="mt-1 text-sm text-gray-500">欢迎回来，请登录您的账户</view>
+  </view>
+
+  <!-- 表单区域 -->
+  <view class="w-full bg-white rounded-2xl shadow-sm p-4 space-y-4">
+    <van-field value="{{ username }}" label="用户名" placeholder="请输入用户名" left-icon="user-o" border="{{ false }}"
+      bind:change="onUsernameChange" custom-style="background: #f9fafb; border-radius: 12px; margin-bottom: 16px;" />
+
+    <van-field value="{{ password }}" type="password" label="密码" placeholder="请输入密码" left-icon="lock-o"
+      border="{{ false }}" bind:change="onPasswordChange"
+      custom-style="background: #f9fafb; border-radius: 12px; margin-bottom: 16px;" />
+
+    <view class="flex items-center justify-between px-2">
+      <van-checkbox value="{{ rememberMe }}" bind:change="onRememberChange" checked-color="var(--theme-primary)">
+        <text class="text-sm text-gray-600">记住账号密码</text>
+      </van-checkbox>
+    </view>
+
+    <view class="mt-8">
+      <van-button type="primary" block round size="large" color="var(--theme-primary)" loading="{{ loading }}"
+        loading-text="登录中..." bind:click="handleLogin">
+        登录
+      </van-button>
+    </view>
+  </view>
+
+  <!-- Toast 必须放在根节点下 -->
+  <van-toast id="van-toast" />
+</view>

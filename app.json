@@ -1,12 +1,55 @@
 {
   "pages": [
-    "pages/index/index",
-    "pages/logs/logs"
+    "pages/holdings/index",
+    "pages/daily-ops/index",
+    "pages/leaderboard/index",
+    "pages/profile/index",
+    "pages/login/login"
   ],
+  "usingComponents": {
+    "van-row": "@vant/weapp/row/index",
+    "van-col": "@vant/weapp/col/index",
+    "van-icon": "@vant/weapp/icon/index",
+    "van-toast": "@vant/weapp/toast/index",
+    "van-dialog": "@vant/weapp/dialog/index"
+  },
   "window": {
+    "navigationBarBackgroundColor": "#ffffff",
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "Weixin",
-    "navigationBarBackgroundColor": "#ffffff"
+    "navigationBarTitleText": "基金助手",
+    "backgroundColor": "#f7f8fa"
+  },
+  "tabBar": {
+    "color": "#646566",
+    "selectedColor": "#0d9488",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/holdings/index",
+        "text": "持仓",
+        "iconPath": "/static/tabs/portfolio.png",
+        "selectedIconPath": "/static/tabs/portfolio-filled.png"
+      },
+      {
+        "pagePath": "pages/daily-ops/index",
+        "text": "操作",
+        "iconPath": "/static/tabs/activity.png",
+        "selectedIconPath": "/static/tabs/activity-filled.png"
+      },
+      {
+        "pagePath": "pages/leaderboard/index",
+        "text": "排行",
+        "iconPath": "/static/tabs/trophy.png",
+        "selectedIconPath": "/static/tabs/trophy-filled.png"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的",
+        "iconPath": "/static/tabs/user-avatar.png",
+        "selectedIconPath": "/static/tabs/user-avatar-filled.png"
+      }
+    ]
   },
   "style": "v2",
   "componentFramework": "glass-easel",
