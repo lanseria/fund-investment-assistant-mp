@@ -1,0 +1,5 @@
+@import 'uno.wxss';
+
+.line-through {
+  text-decoration: line-through; /* 设置删除线 */
+}

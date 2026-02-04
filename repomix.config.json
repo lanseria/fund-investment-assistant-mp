@@ -1,0 +1,39 @@
+{
+  "$schema": "https://repomix.com/schemas/latest/schema.json",
+  "output": {
+    "filePath": "ai/project_context.xml",
+    "style": "xml",
+    "truncateBase64": false,
+    "copyToClipboard": false,
+    "directoryStructure": true
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.js",
+    "**/*.wxml",
+    "**/*.wxss",
+    "**/*.json",
+    "**/*.md"
+  ],
+  "ignore": {
+    "useGitignore": true,
+    "useDefaultPatterns": true,
+    "customPatterns": [
+      "ai",
+      "repomix.config.json",
+      "repomix-instruction.md",
+      "node_modules/**",
+      "miniprogram_npm/**",
+      "dist/**",
+      "unpackage/**",
+      "**/*.project.config.json",
+      "**/project.private.config.json",
+      "composables/*-min.js",
+      "composables/dayjs/",
+      "uno.wxss"
+    ]
+  },
+  "tokenCount": {
+    "encoding": "o200k_base"
+  }
+}

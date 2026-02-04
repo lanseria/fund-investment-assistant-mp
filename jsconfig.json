@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ESNext",
+    "paths": {
+      "@vant/*": ["./miniprogram_npm/@vant/*"],
+      "dayjs": ["./miniprogram_npm/dayjs"],
+      "~/composables/*": ["./composables/*"],
+    }
+  },
+  "exclude": ["node_modules"]
+}

@@ -1,0 +1,26 @@
+{
+  "name": "fund-investment-assistant-mp",
+  "type": "module",
+  "version": "9.6.0",
+  "scripts": {
+    "dev": "npm run dev:unocss",
+    "dev:unocss": "unocss --watch",
+    "build:unocss": "unocss"
+  },
+  "dependencies": {
+    "@vant/weapp": "^1.11.7",
+    "axios-miniprogram": "^2.7.2",
+    "big.js": "^7.0.1",
+    "dayjs": "^1.11.19",
+    "qs": "5.2.1"
+  },
+  "devDependencies": {
+    "@types/big.js": "^6.2.2",
+    "@unocss/cli": "^66.6.0",
+    "browserslist": "^4.28.1",
+    "miniprogram-api-typings": "^5.0.0",
+    "unocss": "^66.6.0",
+    "unocss-preset-autoprefixer": "^0.0.9",
+    "unocss-preset-weapp": "^66.0.2"
+  }
+}

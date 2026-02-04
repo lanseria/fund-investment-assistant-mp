@@ -1,0 +1,6 @@
+node_modules/
+miniprogram_npm/
+env.js
+.DS_Store
+ai/project_context.xml
+.claude
