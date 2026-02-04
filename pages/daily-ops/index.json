@@ -1,3 +1,5 @@
 {
+  "navigationBarTitleText": "每日操作",
+  "enablePullDownRefresh": true,
   "usingComponents": {}
 }

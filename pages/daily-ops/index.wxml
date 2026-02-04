@@ -1,2 +1,97 @@
-<!--pages/daily-ops/index.wxml-->
-<text>pages/daily-ops/index.wxml</text>
+<view class="min-h-screen bg-hex-F7F8FA pb-10">
+  <!-- 1. 日期选择器 -->
+  <view class="bg-white p-4 mb-4 shadow-sm flex justify-between items-center">
+    <view class="flex items-center gap-2" bindtap="showCalendar">
+      <van-icon name="calendar-o" color="#0D9488" size="20px" />
+      <text class="text-lg font-bold text-hex-1F2937">{{ selectedDate }}</text>
+      <van-icon name="arrow-down" color="#9CA3AF" size="12px" />
+    </view>
+
+    <van-button wx:if="{{ hasPending }}" plain type="danger" size="small" round icon="delete-o"
+      bind:click="handleClearPending">
+      清空待处理
+    </van-button>
+  </view>
+
+  <!-- 2. 用户分组列表 -->
+  <view class="px-3">
+    <van-collapse value="{{ activeNames }}" bind:change="onCollapseChange" border="{{ false }}">
+      <van-collapse-item wx:for="{{ groupedTransactions }}" wx:key="username" name="{{ item.user.username }}"
+        custom-class="mb-3 rounded-2xl overflow-hidden shadow-sm" content-class="!p-0">
+        <!-- 自定义标题槽：显示用户信息和资产概览 -->
+        <view slot="title" class="flex flex-col">
+          <view class="flex items-center gap-2">
+            <text class="font-bold text-hex-1F2937">{{ item.user.username }}</text>
+            <van-tag wx:if="{{ item.user.isAiAgent }}" color="#3b82f6" plain>AI</van-tag>
+            <text class="text-10px text-hex-9CA3AF">({{ item.txs.length }}笔)</text>
+          </view>
+          <view class="flex gap-3 mt-1">
+            <text class="text-10px text-hex-6B7280 font-mono">资产: ¥{{ item.user.stats.totalAssets }}</text>
+            <text class="text-10px text-hex-6B7280 font-mono">现金: ¥{{ item.user.stats.cash }}</text>
+          </view>
+        </view>
+
+        <!-- 内部交易列表 -->
+        <view class="divide-y divide-hex-F3F4F6">
+          <view wx:for="{{ item.txs }}" wx:for-item="tx" wx:key="id" class="p-4 bg-white">
+            <view class="flex justify-between items-start mb-2">
+              <view class="flex items-center gap-2">
+                <view
+                  class="text-xs px-1.5 py-0.5 rounded {{ tx.status === 'confirmed' ? 'bg-hex-ECFDF5 text-hex-10B981' : 'bg-hex-FFFBEB text-hex-F59E0B' }}">
+                  {{ tx.typeLabel }}
+                </view>
+                <text class="font-bold text-hex-1F2937 text-sm truncate max-w-300rpx">{{ tx.fundName || tx.fundCode
+                  }}</text>
+              </view>
+              <text class="text-xs font-mono text-hex-9CA3AF">{{ tx.time }}</text>
+            </view>
+
+            <view class="flex justify-between items-center">
+              <view class="flex flex-col">
+                <text class="text-10px text-hex-9CA3AF">申报</text>
+                <text class="text-sm font-mono text-hex-4B5563">{{ tx.orderDetail }}</text>
+              </view>
+              <view class="text-right" wx:if="{{ tx.status === 'confirmed' }}">
+                <text class="text-10px text-hex-9CA3AF">成交额</text>
+                <view class="text-sm font-bold font-numeric text-hex-1F2937">¥{{ tx.confirmedAmount }}</view>
+              </view>
+              <view class="text-right" wx:else>
+                <text class="text-xs text-hex-F59E0B italic">待确认...</text>
+              </view>
+            </view>
+
+            <view wx:if="{{ tx.note }}" class="mt-2 text-10px text-hex-9CA3AF italic bg-hex-F9FAFB p-1 rounded">
+              备注: {{ tx.note }}
+            </view>
+          </view>
+
+          <!-- 用户操作按钮组 -->
+          <view class="p-3 bg-hex-F9FAFB flex justify-end gap-3">
+            <van-button size="mini" icon="description" bind:click="handleCopyPrompt" data-user="{{ item.user }}">复制
+              Prompt</van-button>
+            <van-button wx:if="{{ isAdmin || currentUserId == item.user.id }}" size="mini" type="info" icon="edit"
+              bind:click="openImportModal" data-user="{{ item.user }}">修正 JSON</van-button>
+          </view>
+        </view>
+      </van-collapse-item>
+    </van-collapse>
+  </view>
+
+  <!-- 3. 日历弹窗：去掉确认按钮，扩大日期范围 -->
+  <van-calendar show="{{ showCalendar }}" color="#0D9488" show-confirm="{{ false }}" min-date="{{ minDate }}"
+    max-date="{{ maxDate }}" bind:close="onCalendarClose" bind:confirm="onCalendarConfirm" />
+
+  <!-- 4. 修正 JSON 弹窗 -->
+  <van-dialog use-slot title="人工修正决策" show="{{ showImportModal }}" show-cancel-button bind:confirm="handleImportSubmit"
+    bind:close="onImportModalClose">
+    <view class="p-4">
+      <view class="text-xs text-hex-9CA3AF mb-2">输入修正后的决策 JSON，将替换当日所有待处理记录：</view>
+      <van-field value="{{ importJson }}" type="textarea" placeholder='{ "decisions": [...] }'
+        autosize="{{ { minHeight: 150 } }}" border="{{ true }}" custom-style="background: #F9FAFB; border-radius: 8px;"
+        bind:change="onJsonChange" />
+    </view>
+  </van-dialog>
+
+  <van-toast id="van-toast" />
+  <van-dialog id="van-dialog" />
+</view>

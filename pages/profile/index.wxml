@@ -12,28 +12,81 @@
       </view>
       <text class="text-xs text-hex-9CA3AF mt-1">用户 ID: {{ user.id || '-' }}</text>
     </view>
-    <van-icon name="setting-o" size="20px" color="#9CA3AF" />
   </view>
 
-  <!-- 2. 资产概览卡片 -->
-  <van-cell-group inset title="资金信息">
+  <!-- 2. 资产信息 -->
+  <van-cell-group inset title="资金信息" custom-class="mb-4">
     <van-cell title="可用现金" center border="{{ false }}">
-      <view slot="default" class="flex flex-col items-end">
-        <!-- 已经通过 big.js 格式化好的字符串 -->
+      <view class="flex items-center justify-end gap-2">
         <text class="text-lg font-bold font-mono text-hex-0D9488">¥{{ user.availableCash }}</text>
-        <text class="text-10px text-hex-9CA3AF">(买入扣除/卖出增加)</text>
+        <van-icon name="edit" color="#9CA3AF" size="16px" bind:click="openCashEdit" />
       </view>
       <van-icon slot="icon" name="bill-o" class="mr-2 text-lg text-hex-4B5563" />
     </van-cell>
   </van-cell-group>
 
-  <!-- 4. 退出登录按钮 -->
-  <view class="p-6 mt-10">
+  <!-- 3. AI 智能代理设置 (搬运自 AiSettingsPanel.vue) -->
+  <van-cell-group inset title="AI 智能助手">
+    <van-cell title="自动操作开关" label="每日 14:40 自动执行分析与下单" center>
+      <van-switch checked="{{ user.isAiAgent }}" size="22px" active-color="#0D9488" bind:change="onAiSwitchChange"
+        disabled="{{ loading }}" />
+    </van-cell>
+
+    <van-collapse value="{{ activeCollapse }}" bind:change="onCollapseChange" border="{{ false }}">
+      <van-collapse-item title="高级配置 (Prompt / 策略)" name="ai-config" icon="setting-o">
+        <view class="p-2">
+          <view class="flex justify-between items-center mb-2">
+            <text class="text-xs text-hex-9CA3AF">System Prompt (系统提示词)</text>
+            <text class="text-xs text-hex-0D9488" bindtap="copyDefaultPrompt">使用默认模板</text>
+          </view>
+          <van-field value="{{ user.aiSystemPrompt }}" type="textarea" placeholder="留空则使用系统默认 Prompt"
+            autosize="{{ { minHeight: 100 } }}" border="{{ true }}"
+            custom-style="background: #F9FAFB; border-radius: 8px; padding: 10px;" bind:change="onPromptChange" />
+          <view class="mt-4 flex justify-end">
+            <van-button size="small" type="primary" color="#0D9488" bind:click="saveAiConfig" loading="{{ loading }}">
+              保存配置
+            </van-button>
+          </view>
+        </view>
+      </van-collapse-item>
+    </van-collapse>
+  </van-cell-group>
+
+  <!-- 4. API Token 面板 (搬运自 ApiTokenPanel.vue) -->
+  <van-cell-group inset title="开发者集成" custom-class="mt-4">
+    <van-cell title="API Token" label="用于授权 Claude AI (MCP) 访问" center border="{{ !generatedToken }}">
+      <van-button slot="right-icon" size="small" plain type="primary" color="#4B5563" bind:click="handleGenerateToken">
+        {{ generatedToken ? '重新生成' : '生成 Token' }}
+      </van-button>
+    </van-cell>
+
+    <view wx:if="{{ generatedToken }}" class="p-4 bg-hex-ECFDF5 mx-4 mb-4 rounded-lg border border-hex-A7F3D0">
+      <view class="text-xs text-hex-065F46 font-bold mb-2">Token 已生成 (仅显示一次)</view>
+      <view class="flex items-center gap-2">
+        <text class="flex-grow text-xs font-mono break-all bg-white p-2 rounded border border-hex-D1FAE5 select-all">{{
+          generatedToken }}</text>
+        <van-button size="mini" type="primary" color="#059669" bind:click="copyToken">复制</van-button>
+      </view>
+      <view class="text-10px text-hex-EF4444 mt-2">⚠️ 请立即复制保存，离开此页面后将无法再次查看。</view>
+    </view>
+  </van-cell-group>
+
+  <!-- 5. 退出登录 -->
+  <view class="p-6 mt-6">
     <van-button block round custom-class="!bg-white !text-hex-EF4444 !border-hex-FEE2E2" bind:click="handleLogout">
       退出登录
     </van-button>
   </view>
 
-  <van-dialog id="van-dialog" />
+  <!-- 弹窗：编辑现金 -->
+  <van-dialog use-slot title="修改可用现金" show="{{ showCashEdit }}" show-cancel-button bind:confirm="confirmCashEdit"
+    bind:close="onCashEditClose">
+    <view class="p-6">
+      <van-field value="{{ tempCash }}" type="digit" label="金额 (元)" placeholder="请输入账户余额" focus="{{ showCashEdit }}"
+        bind:change="onTempCashChange" />
+    </view>
+  </van-dialog>
+
   <van-toast id="van-toast" />
+  <van-dialog id="van-dialog" />
 </view>

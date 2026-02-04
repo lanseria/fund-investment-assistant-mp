@@ -1,1 +1,9 @@
-/* pages/leaderboard/index.wxss */
+/* 针对 font-mono 这种特殊字体在不同平台的适配 */
+.font-numeric {
+  font-family: "Courier New", Courier, monospace;
+}
+
+/* 渐变动画 */
+.van-loading {
+  margin: 0 auto;
+}

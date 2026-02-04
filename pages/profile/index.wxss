@@ -1,12 +1,14 @@
-/* 自定义 Vant Cell 样式 */
 .van-cell-group__title {
-  color: #818694 !important; /* 使用 hex 颜色 */
+  color: #818694 !important;
   font-weight: 500;
   padding: 15px 15px 8px !important;
 }
 
-/* 按钮点击反馈 */
+/* 强制让折叠面板内部无 padding 以适应 Field */
+.van-collapse-item__content {
+  padding: 0 !important;
+}
+
 .van-button--active {
   opacity: 0.8;
-  background-color: #F9FAFB !important;
 }
