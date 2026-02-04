@@ -1,1 +1,12 @@
-/* pages/profile/index.wxss */
+/* 自定义 Vant Cell 样式 */
+.van-cell-group__title {
+  color: #818694 !important; /* 使用 hex 颜色 */
+  font-weight: 500;
+  padding: 15px 15px 8px !important;
+}
+
+/* 按钮点击反馈 */
+.van-button--active {
+  opacity: 0.8;
+  background-color: #F9FAFB !important;
+}

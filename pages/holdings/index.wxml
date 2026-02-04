@@ -6,17 +6,19 @@
       <view class="absolute -right-10 -top-10 w-40 h-40 bg-white opacity-10 rounded-full"></view>
 
       <view class="text-sm opacity-80 mb-1">总市值 (元)</view>
-      <view class="text-4xl font-bold font-mono mb-6">{{ summary.totalEstimateAmount || '0.00' }}</view>
+      <view class="text-4xl font-bold font-mono mb-6 text-white">{{ summary.totalEstimateAmount }}</view>
 
       <van-row>
         <van-col span="12">
           <view class="text-xs opacity-80">当日盈亏</view>
-          <view class="text-lg font-bold">{{ summary.totalProfitLoss >= 0 ? '+' : '' }}{{ summary.totalProfitLoss ||
-            '0.00' }}</view>
+          <view class="text-lg font-bold">
+            <!-- 格式化后显示 -->
+            {{ summary.totalProfitLoss >= 0 ? '+' : '' }}{{ summary.totalProfitLoss }}
+          </view>
         </van-col>
         <van-col span="12">
-          <view class="text-xs opacity-80">收益率</view>
-          <view class="text-lg font-bold">{{ summary.totalPercentageChange || '0.00' }}%</view>
+          <view class="text-xs opacity-80">总收益率</view>
+          <view class="text-lg font-bold">{{ summary.totalPercentageChange }}%</view>
         </van-col>
       </van-row>
     </view>
@@ -54,26 +56,26 @@
       data-code="{{ item.code }}">
       <view class="flex justify-between items-start mb-2">
         <view>
-          <view class="font-bold text-gray-800">{{ item.name }}</view>
-          <view class="text-xs text-gray-400">{{ item.code }}</view>
+          <view class="font-bold text-hex-1F2937">{{ item.name }}</view>
+          <view class="text-xs text-hex-9CA3AF">{{ item.code }}</view>
         </view>
         <view class="text-right">
-          <view class="text-sm font-bold {{ item.percentageChange >= 0 ? 'text-red-500' : 'text-green-500' }}">
+          <!-- 根据 string 转 number 判断正负 -->
+          <view class="text-sm font-bold {{ item.percentageChange >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
             {{ item.percentageChange >= 0 ? '+' : '' }}{{ item.percentageChange }}%
           </view>
-          <view class="text-10px text-gray-400">当日涨跌</view>
         </view>
       </view>
 
-      <view class="flex justify-between border-t border-gray-50 pt-3 mt-2">
+      <view class="flex justify-between border-t border-hex-F9FAFB pt-3 mt-2">
         <view>
-          <view class="text-xs text-gray-400">市值</view>
-          <view class="text-sm font-medium">{{ item.holdingAmount || '-' }}</view>
+          <view class="text-xs text-hex-9CA3AF">市值</view>
+          <view class="text-sm font-mono text-hex-1F2937">{{ item.holdingAmount }}</view>
         </view>
         <view class="text-center">
-          <view class="text-xs text-gray-400">收益</view>
-          <view class="text-sm font-medium {{ item.holdingProfitAmount >= 0 ? 'text-red-500' : 'text-green-500' }}">
-            {{ item.holdingProfitAmount || '0' }}
+          <view class="text-xs text-hex-9CA3AF">收益</view>
+          <view class="text-sm font-mono {{ item.holdingProfitAmount >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
+            {{ item.holdingProfitAmount >= 0 ? '+' : '' }}{{ item.holdingProfitAmount }}
           </view>
         </view>
         <view class="text-right">

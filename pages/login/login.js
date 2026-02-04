@@ -65,7 +65,7 @@ Page({
 
         // 3. 跳转到首页
         setTimeout(() => {
-          wx.reLaunch({ url: '/pages/index/index' });
+          wx.reLaunch({ url: '/pages/holdings/index' });
         }, 1000);
       }
     } catch (err) {

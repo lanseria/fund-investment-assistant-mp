@@ -29,6 +29,9 @@ export default defineConfig({
   },
   theme: {
     colors: {
+      // 这样定义后，使用 bg-primary 会直接生成 #0D9488
+      primary: '#0D9488',
+      'primary-hover': '#0F766E',
     },
   },
   presets: [
@@ -36,6 +39,10 @@ export default defineConfig({
       whRpx: false,
     }),
     presetAutoprefixer(['defaults', 'iOS >= 10', 'Chrome >= 51', 'Edge >= 15', 'Firefox >= 54'])
+  ],
+  shortcuts: [
+    // 定义快捷类，方便搬运 Web 端的逻辑
+    ['btn-primary', 'bg-hex-0D9488 text-white rounded-md'],
   ],
   separators: '__',
   safelist: [

@@ -1,2 +1,39 @@
-<!--pages/profile/index.wxml-->
-<text>pages/profile/index.wxml</text>
+<view class="min-h-screen bg-hex-F7F8FA pb-10">
+  <!-- 1. 用户基础信息头部 -->
+  <view class="bg-white p-6 flex items-center mb-4 shadow-sm">
+    <view
+      class="w-16 h-16 rounded-full bg-hex-0D9488 flex items-center justify-center text-white text-2xl font-bold shadow-md">
+      {{ user.username ? user.username[0] : 'U' }}
+    </view>
+    <view class="ml-4 flex-grow">
+      <view class="flex items-center gap-2">
+        <text class="text-xl font-bold text-hex-1F2937">{{ user.username || '加载中...' }}</text>
+        <van-tag type="primary" color="#0D9488" round>{{ user.role }}</van-tag>
+      </view>
+      <text class="text-xs text-hex-9CA3AF mt-1">用户 ID: {{ user.id || '-' }}</text>
+    </view>
+    <van-icon name="setting-o" size="20px" color="#9CA3AF" />
+  </view>
+
+  <!-- 2. 资产概览卡片 -->
+  <van-cell-group inset title="资金信息">
+    <van-cell title="可用现金" center border="{{ false }}">
+      <view slot="default" class="flex flex-col items-end">
+        <!-- 已经通过 big.js 格式化好的字符串 -->
+        <text class="text-lg font-bold font-mono text-hex-0D9488">¥{{ user.availableCash }}</text>
+        <text class="text-10px text-hex-9CA3AF">(买入扣除/卖出增加)</text>
+      </view>
+      <van-icon slot="icon" name="bill-o" class="mr-2 text-lg text-hex-4B5563" />
+    </van-cell>
+  </van-cell-group>
+
+  <!-- 4. 退出登录按钮 -->
+  <view class="p-6 mt-10">
+    <van-button block round custom-class="!bg-white !text-hex-EF4444 !border-hex-FEE2E2" bind:click="handleLogout">
+      退出登录
+    </van-button>
+  </view>
+
+  <van-dialog id="van-dialog" />
+  <van-toast id="van-toast" />
+</view>

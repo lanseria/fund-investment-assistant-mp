@@ -1,5 +1,15 @@
 @import 'uno.wxss';
-
+/* app.wxss */
+page {
+  /* 必须写在 page 作用域内 */
+  --theme-primary: #0D9488;
+  --theme-primary-hover: #0F766E;
+  
+  /* 也可以顺便定义 Vant 的全局主题变量，这样 Vant 组件会自动生效 */
+  --button-primary-background-color: #0D9488;
+  --button-primary-border-color: #0D9488;
+  --toast-background-color: rgba(0, 0, 0, 0.7);
+}
 .line-through {
   text-decoration: line-through; /* 设置删除线 */
 }

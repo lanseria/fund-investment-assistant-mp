@@ -13,7 +13,7 @@
     <van-field value="{{ username }}" label="用户名" placeholder="请输入用户名" left-icon="user-o" border="{{ false }}"
       bind:change="onUsernameChange" custom-style="background: #f9fafb; border-radius: 12px; margin-bottom: 16px;" />
 
-    <van-field value="{{ password }}" type="password" label="密码" placeholder="请输入密码" left-icon="lock-o"
+    <van-field value="{{ password }}" type="password" label="密码" placeholder="请输入密码" left-icon="lock"
       border="{{ false }}" bind:change="onPasswordChange"
       custom-style="background: #f9fafb; border-radius: 12px; margin-bottom: 16px;" />
 

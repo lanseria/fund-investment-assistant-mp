@@ -7,11 +7,16 @@
     "pages/login/login"
   ],
   "usingComponents": {
+    "van-tag": "@vant/weapp/tag/index",
     "van-row": "@vant/weapp/row/index",
     "van-col": "@vant/weapp/col/index",
     "van-icon": "@vant/weapp/icon/index",
     "van-toast": "@vant/weapp/toast/index",
-    "van-dialog": "@vant/weapp/dialog/index"
+    "van-dialog": "@vant/weapp/dialog/index",
+    "van-field": "@vant/weapp/field/index",
+    "van-checkbox": "@vant/weapp/checkbox/index",
+    "van-checkbox-group": "@vant/weapp/checkbox-group/index",
+    "van-button": "@vant/weapp/button/index"
   },
   "window": {
     "navigationBarBackgroundColor": "#ffffff",
