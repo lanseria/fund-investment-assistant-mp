@@ -46,5 +46,9 @@ export default defineConfig({
   ],
   separators: '__',
   safelist: [
+    'bg-hex-EF4444',
+    'bg-hex-22C55E',
+    'bg-hex-A855F7',
+    'bg-hex-3B82F6',
   ]
 })

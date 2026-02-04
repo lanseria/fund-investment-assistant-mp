@@ -41,52 +41,94 @@
     </scroll-view>
   </view>
 
-  <!-- 3. 持仓列表头部 -->
-  <view class="px-4 flex justify-between items-center mb-2">
-    <view class="text-lg font-bold text-gray-800">我的持仓 ({{ holdings.length }})</view>
-    <view class="flex gap-4">
-      <van-icon name="filter-o" size="20px" color="#646566" bind:click="toggleFilter" />
-      <van-icon name="add-o" size="20px" color="#0d9488" bind:click="onAddFund" />
-    </view>
-  </view>
-
-  <!-- 4. 持仓列表内容 -->
+  <!-- 3. 持仓列表 -->
   <view class="px-4 space-y-3">
-    <view wx:for="{{ holdings }}" wx:key="code" class="bg-white rounded-2xl p-4 shadow-sm" bindtap="toDetail"
+    <view wx:for="{{ holdings }}" wx:key="code" class="bg-white rounded-2xl p-4 shadow-sm mb-3" bindtap="toDetail"
       data-code="{{ item.code }}">
+
+      <!-- 第一行：名称与涨跌幅 -->
       <view class="flex justify-between items-start mb-2">
         <view>
-          <view class="font-bold text-hex-1F2937">{{ item.name }}</view>
-          <view class="text-xs text-hex-9CA3AF">{{ item.code }}</view>
+          <view class="font-bold text-hex-1F2937 text-base">{{ item.name }}</view>
+          <text class="text-xs text-hex-9CA3AF font-mono">{{ item.code }}</text>
         </view>
         <view class="text-right">
-          <!-- 根据 string 转 number 判断正负 -->
-          <view class="text-sm font-bold {{ item.percentageChange >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
+          <!-- 右上角主要展示：今日估算涨跌幅 -->
+          <view
+            class="text-lg font-bold font-numeric {{ item.percentageChange >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
             {{ item.percentageChange >= 0 ? '+' : '' }}{{ item.percentageChange }}%
           </view>
         </view>
       </view>
 
-      <view class="flex justify-between border-t border-hex-F9FAFB pt-3 mt-2">
-        <view>
-          <view class="text-xs text-hex-9CA3AF">市值</view>
-          <view class="text-sm font-mono text-hex-1F2937">{{ item.holdingAmount }}</view>
+      <!-- 第二行：安全状态 + 交易点阵 (热点图) -->
+      <view class="flex items-center gap-3 h-6 mb-2">
+        <!-- 7天持有期提示 -->
+        <view wx:if="{{ item.lastBuyStatus }}"
+          class="text-10px px-12rpx py-4rpx rounded border flex items-center gap-1 {{ item.lastBuyStatus.isSafe ? 'bg-hex-F9FAFB text-hex-9CA3AF border-hex-E5E7EB' : 'bg-hex-FFFBEB text-hex-F59E0B border-hex-FDE68A animate-pulse' }}">
+          <van-icon name="{{ item.lastBuyStatus.isSafe ? 'shield-check-o' : 'clock-o' }}" size="10px" />
+          <text class="font-bold">{{ item.lastBuyStatus.label }}</text>
         </view>
-        <view class="text-center">
-          <view class="text-xs text-hex-9CA3AF">收益</view>
-          <view class="text-sm font-mono {{ item.holdingProfitAmount >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
-            {{ item.holdingProfitAmount >= 0 ? '+' : '' }}{{ item.holdingProfitAmount }}
-          </view>
-        </view>
-        <view class="text-right">
-          <view class="text-xs text-gray-400">策略</view>
-          <view class="flex gap-1 justify-end">
-            <view wx:if="{{ item.signals.rsi }}" class="text-10px px-1 rounded bg-red-100 text-red-600">{{
-              item.signals.rsi }}</view>
-            <view wx:else class="text-10px px-1 rounded bg-gray-100 text-gray-400">持币</view>
+
+        <!-- 分隔线 -->
+        <view wx:if="{{ item.recentTransactions.length }}" class="w-1px h-3 bg-hex-E5E7EB"></view>
+
+        <!-- 交易热点图 (由右向左排列) -->
+        <view class="flex flex-row-reverse items-center">
+          <view wx:for="{{ item.formattedRecentTxs }}" wx:for-item="tx" wx:key="id" class="relative ml--4rpx">
+            <view class="w-20rpx h-20rpx rounded-full border border-white {{ tx.colorClass }}"
+              style="z-index: {{ 10 - index }}"></view>
           </view>
         </view>
       </view>
+
+      <!-- 第三行：待确认交易标签 (Pending) -->
+      <view wx:if="{{ item.pendingTransactions.length }}" class="flex flex-wrap gap-2 mb-3">
+        <view wx:for="{{ item.pendingTransactions }}" wx:for-item="ptx" wx:key="id"
+          class="text-10px px-2 py-4rpx rounded border flex items-center gap-1 {{ ptx.type === 'buy' ? 'bg-hex-FEF2F2 text-hex-EF4444 border-hex-FEE2E2' : 'bg-hex-F0FDF4 text-hex-22C55E border-hex-DCFCE7' }}">
+          <view class="w-12rpx h-12rpx rounded-full bg-current animate-ping"></view>
+          <text>{{ ptx.typeLabel }}: {{ ptx.displayValue }}</text>
+        </view>
+      </view>
+
+      <!-- [第四部分：数值详情 - 核心修改区] -->
+      <view class="flex justify-between border-t border-hex-F9FAFB pt-3">
+        <!-- 1. 持有市值 -->
+        <view class="w-1/3">
+          <view class="text-10px text-hex-9CA3AF">持有市值</view>
+          <view class="text-sm font-mono font-bold text-hex-1F2937">¥{{ item.holdingAmount }}</view>
+        </view>
+
+        <!-- 2. 持有总盈亏 (累计) -->
+        <view class="w-1/3 text-center">
+          <view class="text-10px text-hex-9CA3AF">持有收益</view>
+          <view class="flex flex-col">
+            <text
+              class="text-sm font-mono font-bold {{ item.holdingProfitAmount >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
+              {{ item.holdingProfitAmount >= 0 ? '+' : '' }}{{ item.holdingProfitAmount }}
+            </text>
+            <text class="text-10px font-mono {{ item.holdingProfitRate >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
+              {{ item.holdingProfitRate >= 0 ? '+' : '' }}{{ item.holdingProfitRate }}%
+            </text>
+          </view>
+        </view>
+
+        <!-- 3. 今日估算盈亏 (当日波动) -->
+        <view class="w-1/3 text-right">
+          <view class="text-10px text-hex-9CA3AF">估算盈亏</view>
+          <view class="flex flex-col" wx:if="{{ item.todayProfitAmount !== null }}">
+            <text
+              class="text-sm font-mono font-bold {{ item.todayProfitAmount >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
+              {{ item.todayProfitAmount >= 0 ? '+' : '' }}{{ item.todayProfitAmount }}
+            </text>
+            <text class="text-10px font-mono {{ item.percentageChange >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
+              {{ item.percentageChange >= 0 ? '+' : '' }}{{ item.percentageChange }}%
+            </text>
+          </view>
+          <view wx:else class="text-xs text-hex-D1D5DB italic mt-1">未持仓</view>
+        </view>
+      </view>
+
     </view>
   </view>
 

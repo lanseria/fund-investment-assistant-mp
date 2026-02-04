@@ -36,7 +36,7 @@
               </view>
 
               <!-- 资产分布条 (UnoCSS 模拟进度条) -->
-              <view class="w-full h-1.5 rounded-full bg-hex-F3F4F6 flex overflow-hidden">
+              <view class="w-full h-12rpx rounded-full bg-hex-F3F4F6 flex overflow-hidden">
                 <view class="h-full bg-hex-3B82F6" style="width: {{ item.fundPercent }}%"></view>
                 <view class="h-full bg-hex-10B981" style="width: {{ item.cashPercent }}%"></view>
               </view>

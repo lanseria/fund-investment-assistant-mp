@@ -1,1 +1,19 @@
-/* pages/holdings/index.wxss */
+/* 呼吸灯效果：针对不满7天的警告状态 */
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-pulse {
+  animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* 覆盖 Vant Tag 字体大小 */
+.van-tag {
+  font-size: 10px !important;
+  padding: 2px 6px !important;
+}
+
+.font-numeric {
+  font-family: 'DIN Alternate', 'Courier New', Courier, monospace;
+}

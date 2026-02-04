@@ -37,7 +37,7 @@
             <view class="flex justify-between items-start mb-2">
               <view class="flex items-center gap-2">
                 <view
-                  class="text-xs px-1.5 py-0.5 rounded {{ tx.status === 'confirmed' ? 'bg-hex-ECFDF5 text-hex-10B981' : 'bg-hex-FFFBEB text-hex-F59E0B' }}">
+                  class="text-xs px-12rpx py-4rpx rounded {{ tx.status === 'confirmed' ? 'bg-hex-ECFDF5 text-hex-10B981' : 'bg-hex-FFFBEB text-hex-F59E0B' }}">
                   {{ tx.typeLabel }}
                 </view>
                 <text class="font-bold text-hex-1F2937 text-sm truncate max-w-300rpx">{{ tx.fundName || tx.fundCode
