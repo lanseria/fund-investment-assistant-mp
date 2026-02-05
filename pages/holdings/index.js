@@ -7,17 +7,16 @@ import Big from 'big.js';
 Page({
   data: {
     holdings: [],
+    holdingsRaw: [],
     summary: {
       totalEstimateAmount: '0.00',
       totalProfitLoss: '0.00',
       totalPercentageChange: '0.00',
       totalHoldingAmount: '0.00' // 新增：昨日市值
     },
-    indices: [ // 模拟指数数据，因为接口没提供，保留之前的 mock 或空
-      { name: '上证指数', value: '3065.23', changeRate: 1.25 },
-      { name: '纳斯达克', value: '16250.5', changeRate: -0.85 },
-      { name: '黄金现货', value: '540.20', changeRate: 0.45 }
-    ]
+    indices: [],
+    sortBy: 'holdingAmount',
+    sortOrder: 'desc'
   },
 
   onShow() {
@@ -26,18 +25,33 @@ Page({
 
   async initData() {
     try {
-      const res = await request({ url: '/fund/holdings/', method: 'GET' });
+      const [res] = await Promise.all([
+        request({ url: '/fund/holdings/', method: 'GET' }),
+        this.loadMarket()
+      ]);
       if (res) {
         // 1. 处理列表数据
         const formattedHoldings = (res.holdings || []).map(item => {
           // 安全转换 Big Number
-          const holdingAmt = new Big(item.holdingAmount || 0);
-          const todayEstAmt = new Big(item.todayEstimateAmount || 0);
+          const holdingAmountRaw = Number(item.holdingAmount || 0);
+          const holdingAmt = new Big(holdingAmountRaw);
+          const todayEstAmtRaw = Number(item.todayEstimateAmount || 0);
+          const todayEstAmt = new Big(todayEstAmtRaw);
+          const holdingSharesRaw = Number(item.holdingShares || 0);
+          const holdingCostRaw = Number(item.holdingCost || 0);
+          const watchFlags = Boolean(
+            item.isWatchOnly || item.isWatch || item.isFollow || item.isFollowing || item.isFocus || item.isFavorite
+          );
+          const hasHolding = holdingAmountRaw > 0 || holdingSharesRaw > 0 || holdingCostRaw > 0;
+          const isWatchOnly = watchFlags || !hasHolding;
           // 获取板块名称
           const sectorLabel = getDictLabel('sectors', item.sector);
 
           // 计算今日盈亏: 今日预估 - 昨日市值 (holdingAmount 在此接口中代表昨日市值)
-          const todayProfitAmount = todayEstAmt.minus(holdingAmt).toFixed(2);
+          const todayProfitAmount = hasHolding ? todayEstAmt.minus(holdingAmt).toFixed(2) : null;
+          const todayProfitAmountRaw = todayProfitAmount ? Number(todayProfitAmount) : 0;
+          const percentageChangeRaw = Number(item.percentageChange || 0);
+          const holdingProfitRateRaw = Number(item.holdingProfitRate || 0);
 
           // 7天持有状态逻辑
           let lastBuyStatus = null;
@@ -68,9 +82,14 @@ Page({
             holdingAmount: formatCurrency(item.holdingAmount), // 持有市值 (昨日)
             holdingProfitAmount: formatCurrency(item.holdingProfitAmount), // 持有收益 (接口有返回)
             holdingProfitRate: item.holdingProfitRate ? item.holdingProfitRate.toFixed(2) : '0.00',
-            todayProfitAmount: formatCurrency(todayProfitAmount),
+            todayProfitAmount: todayProfitAmount !== null ? formatCurrency(todayProfitAmount) : null,
             percentageChange: item.percentageChange ? item.percentageChange.toFixed(2) : '0.00',
             todayEstimateAmount: formatCurrency(item.todayEstimateAmount),
+            holdingAmountRaw,
+            todayProfitAmountRaw,
+            percentageChangeRaw,
+            holdingProfitRateRaw,
+            isWatchOnly,
             lastBuyStatus,
             formattedRecentTxs,
             pendingTransactions: (item.pendingTransactions || []).map(ptx => ({
@@ -81,9 +100,10 @@ Page({
         });
 
         // 2. 处理汇总数据
-        const summaryData = res.summary || {};
+        const sortedHoldings = this.getSortedHoldings(formattedHoldings);
         this.setData({
-          holdings: formattedHoldings,
+          holdingsRaw: formattedHoldings,
+          holdings: sortedHoldings,
           summary: {
             count: res.summary.count || formattedHoldings.length,
             totalEstimateAmount: formatCurrency(res.summary.totalEstimateAmount),
@@ -92,6 +112,55 @@ Page({
             totalHoldingAmount: formatCurrency(res.summary.totalHoldingAmount)
           }
         });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  },
+
+  getSortedHoldings(list) {
+    const { sortBy, sortOrder } = this.data;
+    const factor = sortOrder === 'asc' ? 1 : -1;
+    const getValue = (item) => {
+      switch (sortBy) {
+        case 'todayChange':
+          return Number(item.percentageChangeRaw || 0);
+        case 'totalProfitRate':
+          return Number(item.holdingProfitRateRaw || 0);
+        case 'holdingAmount':
+        default:
+          return Number(item.holdingAmountRaw || 0);
+      }
+    };
+
+    return [...list].sort((a, b) => {
+      const diff = getValue(a) - getValue(b);
+      if (diff !== 0) return diff * factor;
+      return (Number(a.holdingAmountRaw || 0) - Number(b.holdingAmountRaw || 0)) * factor;
+    });
+  },
+
+  onSortTap(e) {
+    const { sort } = e.currentTarget.dataset;
+    let sortOrder = 'desc';
+    if (this.data.sortBy === sort) {
+      sortOrder = this.data.sortOrder === 'desc' ? 'asc' : 'desc';
+    }
+    this.setData({
+      sortBy: sort,
+      sortOrder,
+      holdings: this.getSortedHoldings(this.data.holdingsRaw)
+    });
+  },
+
+  async loadMarket() {
+    try {
+      const marketRes = await request({ url: '/market/', method: 'GET' });
+      if (marketRes) {
+        const indices = Object.values(marketRes || {}).map(item => ({
+          ...item
+        }));
+        this.setData({ indices });
       }
     } catch (err) {
       console.error(err);

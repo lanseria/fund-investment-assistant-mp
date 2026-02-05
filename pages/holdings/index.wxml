@@ -93,9 +93,28 @@
     <view class="flex items-center justify-between mb-24rpx mt-32rpx">
       <view class="text-28rpx font-bold text-hex-374151">基金列表</view>
       <!-- 简单的排序指示器 -->
-      <view class="flex items-center gap-4rpx text-20rpx text-hex-9CA3AF">
-        <view>按金额</view>
-        <van-icon name="sort" />
+      <view class="flex items-center gap-8rpx text-20rpx">
+        <view
+          class="flex items-center gap-4rpx px-12rpx py-6rpx rounded-full border {{ sortBy === 'holdingAmount' ? 'bg-hex-EEF2FF text-hex-3B82F6 border-hex-C7D2FE' : 'text-hex-9CA3AF border-hex-E5E7EB' }}"
+          bindtap="onSortTap" data-sort="holdingAmount">
+          <view>按金额</view>
+          <van-icon wx:if="{{ sortBy === 'holdingAmount' }}"
+            name="{{ sortOrder === 'asc' ? 'arrow-up' : 'arrow-down' }}" size="12px" />
+        </view>
+        <view
+          class="flex items-center gap-4rpx px-12rpx py-6rpx rounded-full border {{ sortBy === 'todayChange' ? 'bg-hex-EEF2FF text-hex-3B82F6 border-hex-C7D2FE' : 'text-hex-9CA3AF border-hex-E5E7EB' }}"
+          bindtap="onSortTap" data-sort="todayChange">
+          <view>今日涨跌</view>
+          <van-icon wx:if="{{ sortBy === 'todayChange' }}" name="{{ sortOrder === 'asc' ? 'arrow-up' : 'arrow-down' }}"
+            size="12px" />
+        </view>
+        <view
+          class="flex items-center gap-4rpx px-12rpx py-6rpx rounded-full border {{ sortBy === 'totalProfitRate' ? 'bg-hex-EEF2FF text-hex-3B82F6 border-hex-C7D2FE' : 'text-hex-9CA3AF border-hex-E5E7EB' }}"
+          bindtap="onSortTap" data-sort="totalProfitRate">
+          <view>总收益率</view>
+          <van-icon wx:if="{{ sortBy === 'totalProfitRate' }}"
+            name="{{ sortOrder === 'asc' ? 'arrow-up' : 'arrow-down' }}" size="12px" />
+        </view>
       </view>
     </view>
 
@@ -111,7 +130,7 @@
           <view class="flex items-start justify-between mb-24rpx">
             <view class="flex flex-col gap-8rpx flex-1 mr-16rpx">
               <!-- 名称 -->
-              <view class="text-32rpx font-bold text-hex-1F2937 truncate">{{ item.name }}</view>
+              <view class="text-32rpx font-bold text-hex-1F2937 truncate min-w-0">{{ item.name }}</view>
 
               <!-- 辅助行：板块标签 + 代码 + 待确认胶囊 -->
               <view class="flex flex-wrap items-center gap-8rpx">
@@ -146,6 +165,13 @@
                   class="px-12rpx py-4rpx rounded-full flex items-center {{ item.percentageChange >= 0 ? 'bg-hex-FEF2F2 text-hex-EF4444' : 'bg-hex-F0FDF4 text-hex-22C55E' }}">
                   <view class="text-22rpx font-semibold">{{ item.percentageChange >= 0 ? '+' : '' }}{{
                     item.percentageChange }}%</view>
+                </view>
+              </block>
+              <block wx:elif="{{ item.isWatchOnly }}">
+                <view class="text-22rpx text-hex-9CA3AF">今日收益率</view>
+                <view
+                  class="text-32rpx font-bold font-numeric {{ item.percentageChange >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
+                  {{ item.percentageChange >= 0 ? '+' : '' }}{{ item.percentageChange }}%
                 </view>
               </block>
               <block wx:else>
