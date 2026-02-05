@@ -1,14 +1,9 @@
-.van-cell-group__title {
-  color: #818694 !important;
-  font-weight: 500;
-  padding: 15px 15px 8px !important;
-}
+/* pages/profile/index.wxss */
+/* 
+  这里大部分样式已经通过 UnoCSS (wxml 中的 class) 实现。
+  仅保留对 Vant 组件的微调
+*/
 
-/* 强制让折叠面板内部无 padding 以适应 Field */
-.van-collapse-item__content {
-  padding: 0 !important;
-}
-
-.van-button--active {
-  opacity: 0.8;
+.van-cell {
+  padding: 32rpx !important; /* 增加单元格内部间距 */
 }

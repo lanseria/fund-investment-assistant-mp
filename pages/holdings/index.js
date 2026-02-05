@@ -6,7 +6,17 @@ import Big from 'big.js';
 Page({
   data: {
     holdings: [],
-    summary: {}
+    summary: {
+      totalEstimateAmount: '0.00',
+      totalProfitLoss: '0.00',
+      totalPercentageChange: '0.00',
+      totalHoldingAmount: '0.00' // 新增：昨日市值
+    },
+    indices: [ // 模拟指数数据，因为接口没提供，保留之前的 mock 或空
+      { name: '上证指数', value: '3065.23', changeRate: 1.25 },
+      { name: '纳斯达克', value: '16250.5', changeRate: -0.85 },
+      { name: '黄金现货', value: '540.20', changeRate: 0.45 }
+    ]
   },
 
   onShow() {
@@ -17,19 +27,18 @@ Page({
     try {
       const res = await request({ url: '/fund/holdings/', method: 'GET' });
       if (res) {
-        const formattedHoldings = res.holdings.map(item => {
-          // --- 1. 计算今日估算收益额 (对应 Web 端逻辑) ---
-          let todayProfitAmount = null;
-          if (item.todayEstimateAmount && item.holdingAmount) {
-            // 今日盈亏 = 今日预估总市值 - 昨日收盘总市值
-            todayProfitAmount = new Big(item.todayEstimateAmount).minus(item.holdingAmount).toFixed(2);
-          }
+        // 1. 处理列表数据
+        const formattedHoldings = (res.holdings || []).map(item => {
+          // 安全转换 Big Number
+          const holdingAmt = new Big(item.holdingAmount || 0);
+          const todayEstAmt = new Big(item.todayEstimateAmount || 0);
 
-          // --- 2. 格式化其他金额 (持有收益额) ---
-          const holdingProfitAmount = item.holdingProfitAmount ? formatCurrency(item.holdingProfitAmount) : '0.00';
-          // 1. 计算安全持有状态 (7天规则)
+          // 计算今日盈亏: 今日预估 - 昨日市值 (holdingAmount 在此接口中代表昨日市值)
+          const todayProfitAmount = todayEstAmt.minus(holdingAmt).toFixed(2);
+
+          // 7天持有状态逻辑
           let lastBuyStatus = null;
-          const recentBuys = item.recentTransactions.filter(t => t.type === 'buy' || t.type === 'convert_in');
+          const recentBuys = (item.recentTransactions || []).filter(t => t.type === 'buy' || t.type === 'convert_in');
           if (recentBuys.length > 0) {
             const lastBuyDate = dayjs(recentBuys[0].date);
             const diffDays = dayjs().diff(lastBuyDate, 'day');
@@ -39,41 +48,45 @@ Page({
             };
           }
 
-          // 2. 格式化近期交易圆点颜色
-          const formattedRecentTxs = item.recentTransactions.map(tx => {
-            let colorClass = 'bg-hex-9CA3AF'; // 默认灰色
+          // 交易热点图颜色映射
+          const formattedRecentTxs = (item.recentTransactions || []).slice(0, 5).map(tx => {
+            let colorClass = 'bg-hex-D1D5DB';
             if (tx.type === 'buy') colorClass = 'bg-hex-EF4444';
             if (tx.type === 'sell') colorClass = 'bg-hex-22C55E';
-            if (tx.type === 'convert_in') colorClass = 'bg-hex-A855F7'; // 紫色
-            if (tx.type === 'convert_out') colorClass = 'bg-hex-3B82F6'; // 蓝色
+            if (tx.type === 'convert_in') colorClass = 'bg-hex-A855F7';
             return { ...tx, colorClass };
           });
 
-          // 3. 格式化待确认交易
-          const pendingTransactions = (item.pendingTransactions || []).map(ptx => ({
-            ...ptx,
-            typeLabel: ptx.type === 'buy' ? '买入' : '卖出',
-            displayValue: ptx.orderAmount ? `¥${ptx.orderAmount}` : `${ptx.orderShares}份`
-          }));
-
           return {
             ...item,
-            percentageChange: item.percentageChange ? item.percentageChange.toFixed(2) : '0.00',
-            holdingAmount: formatCurrency(item.holdingAmount),
-            holdingProfitAmount: holdingProfitAmount, // 持有收益额
+            name: item.name,
+            code: item.code,
+            holdingAmount: formatCurrency(item.holdingAmount), // 持有市值 (昨日)
+            holdingProfitAmount: formatCurrency(item.holdingProfitAmount), // 持有收益 (接口有返回)
             holdingProfitRate: item.holdingProfitRate ? item.holdingProfitRate.toFixed(2) : '0.00',
-            todayProfitAmount: todayProfitAmount, // 今日估值收益额
+            todayProfitAmount: formatCurrency(todayProfitAmount),
+            percentageChange: item.percentageChange ? item.percentageChange.toFixed(2) : '0.00',
+            todayEstimateAmount: formatCurrency(item.todayEstimateAmount),
             lastBuyStatus,
             formattedRecentTxs,
-            pendingTransactions
+            pendingTransactions: (item.pendingTransactions || []).map(ptx => ({
+              ...ptx,
+              typeLabel: ptx.type === 'buy' ? '买入' : '卖出'
+            }))
           };
         });
 
+        // 2. 处理汇总数据
+        const summaryData = res.summary || {};
         this.setData({
           holdings: formattedHoldings,
-          'summary.totalEstimateAmount': formatCurrency(res.summary.totalEstimateAmount),
-          'summary.totalProfitLoss': formatCurrency(res.summary.totalProfitLoss),
-          'summary.totalPercentageChange': res.summary.totalPercentageChange.toFixed(2)
+          summary: {
+            totalEstimateAmount: formatCurrency(summaryData.totalEstimateAmount),
+            totalProfitLoss: formatCurrency(summaryData.totalProfitLoss),
+            totalPercentageChange: summaryData.totalPercentageChange ? summaryData.totalPercentageChange.toFixed(2) : '0.00',
+            // 使用昨日市值替换原来的持有收益位置
+            totalHoldingAmount: formatCurrency(summaryData.totalHoldingAmount)
+          }
         });
       }
     } catch (err) {

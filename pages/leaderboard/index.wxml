@@ -1,6 +1,7 @@
-<view class="min-h-screen bg-hex-F7F8FA pb-10">
-  <!-- 1. 周期切换 Tab -->
-  <van-tabs active="{{ activePeriod }}" color="#0D9488" bind:change="onPeriodChange" sticky animated>
+<view class="page-shell ui-page pb-40rpx">
+  <!-- 1. 周期切换 Tab (直接置顶) -->
+  <van-tabs active="{{ activePeriod }}" color="#0D9488" title-active-color="#0D9488" bind:change="onPeriodChange" sticky
+    animated swipeable>
     <van-tab title="日榜" name="1d"></van-tab>
     <van-tab title="周榜" name="1w"></van-tab>
     <van-tab title="月榜" name="1m"></van-tab>
@@ -8,87 +9,104 @@
   </van-tabs>
 
   <!-- 2. 排行列表 -->
-  <view class="p-3">
-    <view wx-if="{{ loading && !leaderboard.length }}" class="flex justify-center py-10">
-      <van-loading color="#0D9488" />
+  <view class="px-24rpx mt-24rpx">
+    <view wx:if="{{ loading && !leaderboard.length }}" class="flex justify-center py-80rpx">
+      <van-loading color="#0D9488" size="24px" vertical>加载排行中...</van-loading>
     </view>
 
     <van-empty wx:if="{{ !loading && !leaderboard.length }}" description="暂无排行数据" />
 
-    <view wx:else class="space-y-3">
+    <view wx:else class="space-y-20rpx">
       <block wx:for="{{ leaderboard }}" wx:key="id">
-        <view class="bg-white rounded-2xl overflow-hidden shadow-sm">
+        <view class="bg-white rounded-24rpx shadow-sm overflow-hidden">
           <!-- 用户主行 -->
-          <view class="p-4 flex items-center" bindtap="toggleExpand" data-user-id="{{ item.id }}">
-            <!-- 排名 -->
-            <view class="w-10 flex-shrink-0 flex justify-center">
-              <image wx:if="{{ item.rank <= 3 }}" class="w-8 h-8" src="/static/rank/Medal{{ item.rank }}.png"
+          <view class="p-24rpx flex items-center active:bg-hex-F9FAFB transition-colors" bindtap="toggleExpand"
+            data-user-id="{{ item.id }}">
+
+            <!-- A. 排名区域 -->
+            <view class="w-60rpx flex-shrink-0 flex justify-center mr-16rpx">
+              <image wx:if="{{ item.rank <= 3 }}" class="w-48rpx h-48rpx" src="/static/rank/Medal{{ item.rank }}.png"
                 mode="aspectFit" />
-              <text wx:else class="text-lg font-bold font-numeric text-hex-9CA3AF">{{ item.rank }}</text>
-            </view>
-
-            <!-- 用户信息 & 资产条 -->
-            <view class="flex-grow ml-2 min-w-0">
-              <view class="flex items-center gap-1 mb-2">
-                <text class="font-bold text-hex-1F2937 truncate max-w-200rpx">{{ item.username }}</text>
-                <van-tag wx:if="{{ item.isAiAgent }}"
-                  color="linear-gradient(to bottom right, #3b82f6, #a855f7)">AI</van-tag>
-              </view>
-
-              <!-- 资产分布条 (UnoCSS 模拟进度条) -->
-              <view class="w-full h-12rpx rounded-full bg-hex-F3F4F6 flex overflow-hidden">
-                <view class="h-full bg-hex-3B82F6" style="width: {{ item.fundPercent }}%"></view>
-                <view class="h-full bg-hex-10B981" style="width: {{ item.cashPercent }}%"></view>
-              </view>
-              <view class="flex justify-between mt-1">
-                <text class="text-10px text-hex-9CA3AF font-mono">总资产: ¥{{ item.totalAssets }}</text>
-                <text class="text-10px text-hex-9CA3AF">仓位: {{ item.fundPercent }}%</text>
+              <view wx:else
+                class="w-40rpx h-40rpx rounded-full bg-hex-F3F4F6 text-hex-9CA3AF text-20rpx font-bold font-numeric flex items-center justify-center">
+                {{ item.rank }}
               </view>
             </view>
 
-            <!-- 收益数据 -->
+            <!-- B. 用户信息 & 资产条 -->
+            <view class="flex-grow min-w-0 mr-24rpx">
+              <view class="flex items-center gap-12rpx mb-12rpx">
+                <text class="font-bold text-28rpx text-hex-1F2937 truncate max-w-240rpx">{{ item.username }}</text>
+                <view wx:if="{{ item.isAiAgent }}"
+                  class="bg-gradient-to-br from-hex-3B82F6 to-hex-A855F7 text-white text-18rpx px-10rpx py-2rpx rounded-full shadow-sm">
+                  AI</view>
+              </view>
+
+              <!-- 资产分布条 (更细致) -->
+              <view class="w-full h-8rpx rounded-full bg-hex-F3F4F6 flex overflow-hidden mb-8rpx">
+                <view class="h-full bg-hex-3B82F6 opacity-80" style="width: {{ item.fundPercent }}%"></view>
+                <view class="h-full bg-hex-10B981 opacity-80" style="width: {{ item.cashPercent }}%"></view>
+              </view>
+
+              <!-- 资产数值 -->
+              <view class="flex justify-between items-center">
+                <text class="text-20rpx text-hex-9CA3AF font-mono">¥{{ item.totalAssets }}</text>
+                <view class="flex items-center gap-8rpx text-18rpx">
+                  <view class="flex items-center gap-4rpx">
+                    <view class="w-8rpx h-8rpx rounded-full bg-hex-3B82F6"></view>
+                    <text class="text-hex-6B7280">{{ item.fundPercent }}%</text>
+                  </view>
+                </view>
+              </view>
+            </view>
+
+            <!-- C. 收益数据 (右侧强调) -->
             <view class="w-160rpx flex-shrink-0 text-right">
               <view
-                class="text-lg font-bold font-numeric {{ item.periodProfit >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
+                class="text-32rpx font-bold font-numeric {{ item.periodProfit >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
                 {{ item.periodProfitRate }}%
               </view>
-              <view class="text-10px text-hex-9CA3AF">
+              <view class="text-20rpx text-hex-9CA3AF font-mono mt-4rpx">
                 {{ item.periodProfit >= 0 ? '+' : '' }}{{ item.periodProfit }}
               </view>
             </view>
 
-            <!-- 展开箭头 -->
-            <view class="ml-2">
-              <van-icon name="{{ expandedId === item.id ? 'arrow-up' : 'arrow-down' }}" color="#D1D5DB" />
+            <!-- D. 展开指示器 -->
+            <view class="ml-16rpx flex-shrink-0">
+              <van-icon name="arrow-down" color="#D1D5DB" size="12px"
+                custom-style="transition: transform 0.3s; transform: rotate({{ expandedId === item.id ? 180 : 0 }}deg);" />
             </view>
           </view>
 
-          <!-- 展开后的持仓列表 (按需加载) -->
-          <view wx:if="{{ expandedId === item.id }}" class="bg-hex-F9FAFB border-t border-hex-F3F4F6 p-4">
-            <view wx:if="{{ detailLoading }}" class="flex justify-center py-4">
-              <van-loading size="20px" />
+          <!-- 展开后的持仓列表 -->
+          <view wx:if="{{ expandedId === item.id }}"
+            class="bg-hex-F9FAFB border-t border-hex-F3F4F6 p-24rpx animation-fade-in">
+            <view wx:if="{{ detailLoading }}" class="flex justify-center py-24rpx">
+              <van-loading size="16px" color="#0D9488" />
             </view>
-            <view wx:else class="space-y-2">
+            <view wx:else class="space-y-16rpx">
               <view wx:for="{{ userHoldings }}" wx:for-item="fund" wx:key="code"
-                class="flex justify-between items-center text-xs">
-                <view class="flex flex-col">
-                  <text class="text-hex-4B5563 font-bold">{{ fund.name }}</text>
-                  <text class="text-hex-9CA3AF text-10px">{{ fund.code }}</text>
+                class="flex justify-between items-center text-24rpx bg-white p-16rpx rounded-16rpx shadow-sm border border-hex-F3F4F6">
+                <view class="flex flex-col max-w-300rpx">
+                  <text class="text-hex-374151 font-bold truncate">{{ fund.name }}</text>
+                  <text class="text-hex-9CA3AF text-20rpx font-mono mt-4rpx">{{ fund.code }}</text>
                 </view>
                 <view class="text-right">
-                  <view class="text-hex-1F2937">¥{{ fund.holdingAmount }}</view>
-                  <view class="{{ fund.holdingProfitRate >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }} text-10px">
+                  <view class="text-hex-1F2937 font-mono font-medium">¥{{ fund.holdingAmount }}</view>
+                  <view
+                    class="text-20rpx font-numeric mt-2rpx {{ fund.holdingProfitRate >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
                     {{ fund.holdingProfitRate > 0 ? '+' : '' }}{{ fund.holdingProfitRate }}%
                   </view>
                 </view>
               </view>
-              <view wx:if="{{ !userHoldings.length }}" class="text-center text-hex-9CA3AF text-xs py-2">暂无公开持仓</view>
+              <view wx:if="{{ !userHoldings.length }}" class="text-center text-hex-9CA3AF text-20rpx py-8rpx">
+                暂无公开持仓或持仓隐藏</view>
             </view>
           </view>
         </view>
       </block>
     </view>
   </view>
-  <!-- 放在页面结构的最底部 -->
+
   <van-toast id="van-toast" />
 </view>

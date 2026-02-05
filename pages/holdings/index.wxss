@@ -1,19 +1,23 @@
+/* pages/holdings/index.wxss */
+
 /* 呼吸灯效果：针对不满7天的警告状态 */
 @keyframes pulse-soft {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
 }
 
 .animate-pulse {
   animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* 覆盖 Vant Tag 字体大小 */
-.van-tag {
-  font-size: 10px !important;
-  padding: 2px 6px !important;
+/* 覆盖 Vant 图标对齐微调 */
+.van-icon {
+  vertical-align: middle;
 }
 
-.font-numeric {
-  font-family: 'DIN Alternate', 'Courier New', Courier, monospace;
+/* 滚动条隐藏 (兼容性处理) */
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  color: transparent;
 }

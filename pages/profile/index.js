@@ -2,7 +2,6 @@ import request from '../../utils/request';
 import { formatCurrency } from '../../utils/format';
 import Dialog from '@vant/weapp/dialog/dialog';
 import Toast from '@vant/weapp/toast/toast';
-import Big from 'big.js';
 
 Page({
   data: {
@@ -11,13 +10,8 @@ Page({
       username: '',
       role: '',
       availableCash: '0.00',
-      isAiAgent: false,
-      aiSystemPrompt: ''
+      isAiAgent: false
     },
-    activeCollapse: [],
-    showCashEdit: false,
-    tempCash: '',
-    generatedToken: '',
     loading: false
   },
 
@@ -34,46 +28,20 @@ Page({
           'user.username': res.username,
           'user.role': res.role,
           'user.isAiAgent': res.isAiAgent,
-          'user.aiSystemPrompt': res.aiSystemPrompt || '',
           'user.availableCash': formatCurrency(res.availableCash)
         });
       }
     } catch (err) { console.error(err); }
   },
 
-  // --- 现金编辑逻辑 ---
-  openCashEdit() {
-    this.setData({
-      showCashEdit: true,
-      tempCash: this.data.user.availableCash.replace(/,/g, '')
-    });
-  },
-
-  onTempCashChange(e) { this.setData({ tempCash: e.detail }); },
-
-  async confirmCashEdit() {
-    const amount = parseFloat(this.data.tempCash);
-    if (isNaN(amount) || amount < 0) {
-      Toast.fail('请输入有效金额');
-      return;
-    }
-
-    try {
-      await request({
-        url: '/user/ai-status',
-        method: 'PUT',
-        data: { availableCash: amount }
-      });
-      Toast.success('余额已更新');
-      this.fetchUserInfo();
-    } catch (err) { Toast.fail('更新失败'); }
-  },
-
-  // --- AI 配置逻辑 ---
+  // --- AI 开关逻辑 ---
   onAiSwitchChange({ detail }) {
+    const action = detail ? '开启' : '关闭';
     Dialog.confirm({
-      title: '提示',
-      message: `确定要${detail ? '开启' : '关闭'} AI 自动操作功能吗？`,
+      title: `${action}智能助手`,
+      message: `确定要${action} AI 自动操作功能吗？\n开启后将在交易日 14:40 自动执行分析与下单。`,
+      confirmButtonText: '确定执行',
+      confirmButtonColor: '#0D9488'
     }).then(async () => {
       this.setData({ loading: true });
       try {
@@ -84,57 +52,25 @@ Page({
         });
         this.setData({ 'user.isAiAgent': detail });
         Toast.success('设置已同步');
+      } catch (e) {
+        // 失败回滚开关状态
+        this.setData({ 'user.isAiAgent': !detail });
       } finally {
         this.setData({ loading: false });
       }
-    }).catch(() => { });
-  },
-
-  onCollapseChange(e) { this.setData({ activeCollapse: e.detail }); },
-  onPromptChange(e) { this.setData({ 'user.aiSystemPrompt': e.detail }); },
-
-  async saveAiConfig() {
-    this.setData({ loading: true });
-    try {
-      await request({
-        url: '/user/ai-status',
-        method: 'PUT',
-        data: { aiSystemPrompt: this.data.user.aiSystemPrompt }
-      });
-      Toast.success('配置已保存');
-    } finally {
-      this.setData({ loading: false });
-    }
-  },
-
-  copyDefaultPrompt() {
-    const template = "你是一位资深量化策略分析师..."; // 对应 Web 端 DEFAULT_PROMPT_TEMPLATE
-    this.setData({ 'user.aiSystemPrompt': template });
-  },
-
-  // --- API Token 逻辑 ---
-  async handleGenerateToken() {
-    Dialog.confirm({
-      title: '生成新 Token',
-      message: '生成新 Token 将导致旧 Token 立即失效。确定继续吗？',
-    }).then(async () => {
-      try {
-        const res = await request({ url: '/user/api-token', method: 'POST' });
-        this.setData({ generatedToken: res.token });
-        Toast.success('Token 已生成');
-      } catch (err) { Toast.fail('生成失败'); }
-    }).catch(() => { });
-  },
-
-  copyToken() {
-    wx.setClipboardData({
-      data: this.data.generatedToken,
-      success: () => Toast.success('已复制到剪贴板')
+    }).catch(() => {
+      // 取消操作，开关状态复原（Vant Switch 需要手动控制）
+      this.setData({ 'user.isAiAgent': !detail });
+      this.fetchUserInfo();
     });
   },
 
   handleLogout() {
-    Dialog.confirm({ title: '提示', message: '确定要退出登录吗？' }).then(async () => {
+    Dialog.confirm({
+      title: '退出登录',
+      message: '确定要退出当前账号吗？',
+      confirmButtonColor: '#EF4444'
+    }).then(async () => {
       wx.removeStorageSync('auth-token');
       wx.removeStorageSync('user-info');
       wx.reLaunch({ url: '/pages/login/login' });

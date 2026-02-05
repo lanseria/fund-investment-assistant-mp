@@ -1,92 +1,83 @@
-<view class="min-h-screen bg-hex-F7F8FA pb-10">
-  <!-- 1. 用户基础信息头部 -->
-  <view class="bg-white p-6 flex items-center mb-4 shadow-sm">
-    <view
-      class="w-16 h-16 rounded-full bg-hex-0D9488 flex items-center justify-center text-white text-2xl font-bold shadow-md">
-      {{ user.username ? user.username[0] : 'U' }}
-    </view>
-    <view class="ml-4 flex-grow">
-      <view class="flex items-center gap-2">
-        <text class="text-xl font-bold text-hex-1F2937">{{ user.username || '加载中...' }}</text>
-        <van-tag type="primary" color="#0D9488" round>{{ user.role }}</van-tag>
-      </view>
-      <text class="text-xs text-hex-9CA3AF mt-1">用户 ID: {{ user.id || '-' }}</text>
+<view class="page-shell ui-page pb-40rpx">
+  <view class="ui-header pb-16rpx">
+    <view>
+      <view class="text-36rpx font-bold text-hex-111827">个人中心</view>
+      <view class="text-24rpx text-hex-6B7280 mt-8rpx">管理您的账户与设置</view>
     </view>
   </view>
 
-  <!-- 2. 资产信息 -->
-  <van-cell-group inset title="资金信息" custom-class="mb-4">
-    <van-cell title="可用现金" center border="{{ false }}">
-      <view class="flex items-center justify-end gap-2">
-        <text class="text-lg font-bold font-mono text-hex-0D9488">¥{{ user.availableCash }}</text>
-        <van-icon name="edit" color="#9CA3AF" size="16px" bind:click="openCashEdit" />
+  <!-- 1. 用户信息卡片 -->
+  <view class="px-32rpx mt-16rpx">
+    <view class="bg-white rounded-32rpx p-40rpx shadow-sm flex items-center">
+      <view
+        class="w-120rpx h-120rpx rounded-full bg-hex-F0FDFA border-4rpx border-hex-CCFBF1 flex items-center justify-center text-hex-0D9488 text-48rpx font-bold shadow-inner">
+        {{ user.username ? user.username[0] : 'U' }}
       </view>
-      <van-icon slot="icon" name="bill-o" class="mr-2 text-lg text-hex-4B5563" />
-    </van-cell>
-  </van-cell-group>
-
-  <!-- 3. AI 智能代理设置 (搬运自 AiSettingsPanel.vue) -->
-  <van-cell-group inset title="AI 智能助手">
-    <van-cell title="自动操作开关" label="每日 14:40 自动执行分析与下单" center>
-      <van-switch checked="{{ user.isAiAgent }}" size="22px" active-color="#0D9488" bind:change="onAiSwitchChange"
-        disabled="{{ loading }}" />
-    </van-cell>
-
-    <van-collapse value="{{ activeCollapse }}" bind:change="onCollapseChange" border="{{ false }}">
-      <van-collapse-item title="高级配置 (Prompt / 策略)" name="ai-config" icon="setting-o">
-        <view class="p-2">
-          <view class="flex justify-between items-center mb-2">
-            <text class="text-xs text-hex-9CA3AF">System Prompt (系统提示词)</text>
-            <text class="text-xs text-hex-0D9488" bindtap="copyDefaultPrompt">使用默认模板</text>
-          </view>
-          <van-field value="{{ user.aiSystemPrompt }}" type="textarea" placeholder="留空则使用系统默认 Prompt"
-            autosize="{{ { minHeight: 100 } }}" border="{{ true }}"
-            custom-style="background: #F9FAFB; border-radius: 8px; padding: 10px;" bind:change="onPromptChange" />
-          <view class="mt-4 flex justify-end">
-            <van-button size="small" type="primary" color="#0D9488" bind:click="saveAiConfig" loading="{{ loading }}">
-              保存配置
-            </van-button>
+      <view class="ml-32rpx flex-grow">
+        <view class="flex items-center gap-16rpx">
+          <text class="text-36rpx font-bold text-hex-1F2937">{{ user.username || '加载中...' }}</text>
+          <view
+            class="bg-hex-F3F4F6 text-hex-4B5563 text-20rpx px-12rpx py-4rpx rounded-8rpx font-medium border border-hex-E5E7EB">
+            {{ user.role }}
           </view>
         </view>
-      </van-collapse-item>
-    </van-collapse>
-  </van-cell-group>
-
-  <!-- 4. API Token 面板 (搬运自 ApiTokenPanel.vue) -->
-  <van-cell-group inset title="开发者集成" custom-class="mt-4">
-    <van-cell title="API Token" label="用于授权 Claude AI (MCP) 访问" center border="{{ !generatedToken }}">
-      <van-button slot="right-icon" size="small" plain type="primary" color="#4B5563" bind:click="handleGenerateToken">
-        {{ generatedToken ? '重新生成' : '生成 Token' }}
-      </van-button>
-    </van-cell>
-
-    <view wx:if="{{ generatedToken }}" class="p-4 bg-hex-ECFDF5 mx-4 mb-4 rounded-lg border border-hex-A7F3D0">
-      <view class="text-xs text-hex-065F46 font-bold mb-2">Token 已生成 (仅显示一次)</view>
-      <view class="flex items-center gap-2">
-        <text class="flex-grow text-xs font-mono break-all bg-white p-2 rounded border border-hex-D1FAE5 select-all">{{
-          generatedToken }}</text>
-        <van-button size="mini" type="primary" color="#059669" bind:click="copyToken">复制</van-button>
+        <view class="text-24rpx text-hex-9CA3AF mt-8rpx font-mono">UID: {{ user.id || '-' }}</view>
       </view>
-      <view class="text-10px text-hex-EF4444 mt-2">⚠️ 请立即复制保存，离开此页面后将无法再次查看。</view>
     </view>
-  </van-cell-group>
-
-  <!-- 5. 退出登录 -->
-  <view class="p-6 mt-6">
-    <van-button block round custom-class="!bg-white !text-hex-EF4444 !border-hex-FEE2E2" bind:click="handleLogout">
-      退出登录
-    </van-button>
   </view>
 
-  <!-- 弹窗：编辑现金 -->
-  <van-dialog use-slot title="修改可用现金" show="{{ showCashEdit }}" show-cancel-button bind:confirm="confirmCashEdit"
-    bind:close="onCashEditClose">
-    <view class="p-6">
-      <van-field value="{{ tempCash }}" type="digit" label="金额 (元)" placeholder="请输入账户余额" focus="{{ showCashEdit }}"
-        bind:change="onTempCashChange" />
-    </view>
-  </van-dialog>
+  <!-- 2. 资产只读卡片 -->
+  <view class="px-32rpx mt-32rpx">
+    <view
+      class="bg-gradient-to-br from-hex-0D9488 to-hex-0F766E rounded-32rpx p-40rpx text-white shadow-lg relative overflow-hidden">
+      <!-- 装饰圆 -->
+      <view class="absolute -right-40rpx -top-40rpx w-200rpx h-200rpx bg-white opacity-10 rounded-full blur-xl"></view>
 
+      <view class="flex items-center gap-16rpx mb-16rpx opacity-90">
+        <van-icon name="balance-o" size="18px" />
+        <text class="text-26rpx font-medium">可用现金余额</text>
+      </view>
+      <view class="text-64rpx font-bold font-numeric tracking-wide">
+        ¥{{ user.availableCash }}
+      </view>
+      <view class="mt-24rpx text-22rpx opacity-70 flex items-center gap-8rpx">
+        <van-icon name="info-o" />
+        <text>该资金用于基金买入补仓</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 3. 功能设置 -->
+  <view class="px-32rpx mt-40rpx">
+    <view class="text-28rpx font-bold text-hex-374151 mb-16rpx px-8rpx">功能设置</view>
+    <view class="bg-white rounded-24rpx overflow-hidden shadow-sm">
+      <van-cell-group border="{{ false }}">
+        <van-cell center border="{{ false }}" title-class="font-bold text-hex-1F2937">
+          <view slot="title" class="flex flex-col">
+            <text class="text-30rpx">AI 自动跟投</text>
+            <text class="text-22rpx text-hex-9CA3AF mt-4rpx font-normal">每日 14:40 自动执行策略分析与交易</text>
+          </view>
+          <van-switch slot="right-icon" checked="{{ user.isAiAgent }}" size="24px" active-color="#0D9488"
+            bind:change="onAiSwitchChange" disabled="{{ loading }}" />
+        </van-cell>
+      </van-cell-group>
+    </view>
+  </view>
+
+  <!-- 4. 退出登录 -->
+  <view class="px-32rpx mt-60rpx">
+    <button
+      class="w-full bg-white text-hex-EF4444 text-30rpx font-bold py-24rpx rounded-full border border-hex-FEE2E2 active:bg-hex-FEF2F2 shadow-sm flex items-center justify-center gap-16rpx transition-all"
+      bindtap="handleLogout">
+      <van-icon name="revoke" />
+      退出登录
+    </button>
+    <view class="text-center text-20rpx text-hex-D1D5DB mt-32rpx mb-20rpx">
+      Fund Assistant v9.6.0
+    </view>
+  </view>
+
+  <!-- 全局组件 -->
   <van-toast id="van-toast" />
   <van-dialog id="van-dialog" />
 </view>

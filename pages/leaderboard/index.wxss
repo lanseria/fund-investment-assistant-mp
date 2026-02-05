@@ -1,9 +1,21 @@
-/* 针对 font-mono 这种特殊字体在不同平台的适配 */
-.font-numeric {
-  font-family: "Courier New", Courier, monospace;
+/* pages/leaderboard/index.wxss */
+
+/* 覆盖 Vant Tabs 背景 */
+.van-tabs__scroll {
+  background-color: #ffffff !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
 }
 
-/* 渐变动画 */
-.van-loading {
-  margin: 0 auto;
+.van-tabs__wrap {
+  border-bottom: 1px solid #f3f4f6;
+}
+
+/* 简单的淡入动画 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animation-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
 }
