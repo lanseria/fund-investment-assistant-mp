@@ -1,6 +1,6 @@
-import request from '../../utils/request';
-import { formatCurrency } from '../../utils/format';
-import { getDictLabel } from '../../utils/dict';
+import request from '~/utils/request';
+import { formatCurrency } from '~/utils/format';
+import { getDictLabel } from '~/utils/dict';
 import dayjs from 'dayjs';
 import Big from 'big.js';
 

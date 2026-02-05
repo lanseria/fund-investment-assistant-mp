@@ -1,5 +1,5 @@
-import request from '../../utils/request';
-import { formatCurrency } from '../../utils/format';
+import request from '~/utils/request';
+import { formatCurrency } from '~/utils/format';
 import dayjs from 'dayjs';
 
 Page({
@@ -21,17 +21,24 @@ Page({
     this.fetchData().then(() => wx.stopPullDownRefresh());
   },
 
-  showCalendar() { this.setData({ showCalendar: true }); },
-  onCalendarClose() { this.setData({ showCalendar: false }); },
+  showCalendar() {
+    this.setData({
+      showCalendar: true
+    });
+  },
+  onCalendarClose() {
+    this.setData({
+      showCalendar: false
+    });
+  },
 
   onCalendarConfirm(e) {
     const date = dayjs(e.detail).format('YYYY-MM-DD');
     this.setData({
       selectedDate: date,
       showCalendar: false
-    }, () => {
-      this.fetchData();
     });
+    this.fetchData();
   },
 
   async fetchData() {

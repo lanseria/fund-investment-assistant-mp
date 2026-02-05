@@ -1,6 +1,6 @@
-import request from '../../utils/request';
+import request from '~/utils/request';
 import Toast from '@vant/weapp/toast/toast';
-import { loadDicts } from '../../utils/dict';
+import { loadDicts } from '~/utils/dict';
 
 
 Page({

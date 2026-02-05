@@ -1,5 +1,5 @@
-import request from '../../utils/request';
-import { formatCurrency } from '../../utils/format';
+import request from '~/utils/request';
+import { formatCurrency } from '~/utils/format';
 import Big from 'big.js';
 
 Page({

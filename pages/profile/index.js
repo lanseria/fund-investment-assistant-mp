@@ -1,5 +1,5 @@
-import request from '../../utils/request';
-import { formatCurrency } from '../../utils/format';
+import request from '~/utils/request';
+import { formatCurrency } from '~/utils/format';
 import Dialog from '@vant/weapp/dialog/dialog';
 import Toast from '@vant/weapp/toast/toast';
 

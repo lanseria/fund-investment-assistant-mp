@@ -30,6 +30,10 @@
     "van-calendar": "@vant/weapp/calendar/index",
     "van-divider": "@vant/weapp/divider/index"
   },
+  "resizable": false,
+  "resolveAlias": {
+    "~/*": "/*"
+  },
   "window": {
     "navigationBarBackgroundColor": "#ffffff",
     "navigationBarTextStyle": "black",
