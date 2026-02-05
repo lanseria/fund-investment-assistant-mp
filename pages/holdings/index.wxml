@@ -128,9 +128,9 @@
         <view class="p-32rpx">
           <!-- A. 顶部行：名称 + 板块 + 代码 -->
           <view class="flex items-start justify-between mb-24rpx">
-            <view class="flex flex-col gap-8rpx flex-1 mr-16rpx">
+            <view class="flex flex-col gap-8rpx flex-1 mr-16rpx min-w-0">
               <!-- 名称 -->
-              <view class="text-32rpx font-bold text-hex-1F2937 truncate min-w-0">{{ item.name }}</view>
+              <view class="text-32rpx font-bold text-hex-1F2937 truncate">{{ item.name }}</view>
 
               <!-- 辅助行：板块标签 + 代码 + 待确认胶囊 -->
               <view class="flex flex-wrap items-center gap-8rpx">
