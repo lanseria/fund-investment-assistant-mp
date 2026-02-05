@@ -1,6 +1,5 @@
 /* pages/holdings/index.wxss */
-
-/* 呼吸灯效果：针对不满7天的警告状态 */
+/* 呼吸灯效果保持不变 */
 @keyframes pulse-soft {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.6; transform: scale(1.1); }
@@ -10,12 +9,12 @@
   animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* 覆盖 Vant 图标对齐微调 */
+/* 覆盖 Vant 图标对齐 */
 .van-icon {
   vertical-align: middle;
 }
 
-/* 滚动条隐藏 (兼容性处理) */
+/* 滚动条隐藏 */
 ::-webkit-scrollbar {
   width: 0;
   height: 0;

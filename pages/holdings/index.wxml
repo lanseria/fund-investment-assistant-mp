@@ -2,51 +2,72 @@
   <!-- 顶部导航区 -->
   <view class="ui-header flex items-end pb-16rpx">
     <view>
-      <view class="text-36rpx font-bold text-hex-111827">持仓组合</view>
+      <view class="text-36rpx font-bold text-hex-111827">我的持仓</view>
       <view class="text-24rpx text-hex-6B7280 mt-8rpx">
-        共 <text class="font-bold text-hex-0D9488">{{ holdings.length }}</text> 只基金
+        把握市场脉搏，智享财富增值
       </view>
     </view>
   </view>
 
-  <!-- 1. 资产概览卡片 (精致版) -->
+  <!-- 1. 资产概览卡片 (复刻 iOS PortfolioSummaryCard) -->
   <view class="ui-section">
-    <view class="relative overflow-hidden rounded-32rpx bg-hex-0D9488 text-white shadow-lg">
-      <!-- 装饰背景 -->
-      <view class="absolute -right-32rpx -top-80rpx w-300rpx h-300rpx bg-white opacity-10 rounded-full blur-2xl"></view>
-      <view class="absolute -left-80rpx -bottom-80rpx w-300rpx h-300rpx bg-hex-0F766E opacity-40 rounded-full blur-xl">
-      </view>
+    <view
+      class="relative overflow-hidden rounded-32rpx bg-gradient-to-br from-hex-3B82F6 to-hex-A855F7 text-white shadow-lg">
+      <!-- 装饰背景圆圈 (CSS模拟 iOS GeometryReader) -->
+      <view class="absolute -right-60rpx -top-40rpx w-300rpx h-300rpx bg-white opacity-10 rounded-full"></view>
+      <view class="absolute -left-40rpx -bottom-40rpx w-200rpx h-200rpx bg-white opacity-10 rounded-full"></view>
 
       <view class="relative z-10 p-40rpx">
-        <view class="flex justify-between items-start mb-8rpx">
-          <view class="text-24rpx opacity-80 font-medium tracking-wide">总预估市值 (元)</view>
-          <view class="text-24rpx px-16rpx py-4rpx bg-white bg-opacity-20 rounded-full flex items-center">
-            <text>{{ summary.totalPercentageChange }}%</text>
-            <van-icon name="{{ summary.totalPercentageChange >= 0 ? 'ascending' : 'descending' }}" class="ml-8rpx" />
+        <!-- 第一行：总资产 + 收益胶囊 -->
+        <view class="flex justify-between items-start mb-32rpx">
+          <view class="flex flex-col">
+            <view class="text-24rpx opacity-80 font-medium tracking-wide mb-8rpx">预估总市值 (CNY)</view>
+            <view class="text-64rpx font-bold font-numeric tracking-tight">{{ summary.totalEstimateAmount }}</view>
+          </view>
+
+          <!-- 收益状态胶囊 -->
+          <view class="flex items-center gap-4rpx px-16rpx py-8rpx bg-white bg-opacity-20 rounded-full">
+            <van-icon name="{{ summary.totalPercentageChange >= 0 ? 'ascending' : 'descending' }}" color="#fff"
+              size="10px" />
+            <view class="text-24rpx font-bold">{{ summary.totalPercentageChange >= 0 ? '+' : '' }}{{
+              summary.totalPercentageChange }}%</view>
           </view>
         </view>
-        <view class="text-60rpx font-bold font-numeric mb-40rpx tracking-tight">{{ summary.totalEstimateAmount }}</view>
 
-        <view class="flex border-t border-white border-opacity-10 pt-32rpx">
-          <view class="flex-1 pr-32rpx border-r border-white border-opacity-10">
-            <view class="text-24rpx opacity-70 mb-8rpx">当日盈亏</view>
-            <view class="font-bold font-numeric text-36rpx truncate">
+        <!-- 分割线 -->
+        <view class="h-1px bg-white opacity-20 w-full mb-32rpx"></view>
+
+        <!-- 第二行：指标网格 (持仓成本 | 预估盈亏 | 数量) -->
+        <view class="flex items-center text-center">
+          <!-- 1. 持仓成本 -->
+          <view class="flex-1 flex flex-col gap-6rpx">
+            <view class="text-22rpx opacity-70">持仓成本</view>
+            <view class="text-30rpx font-bold font-numeric">{{ summary.totalHoldingAmount }}</view>
+          </view>
+
+          <view class="w-1px h-40rpx bg-white opacity-30"></view>
+
+          <!-- 2. 预估盈亏 -->
+          <view class="flex-1 flex flex-col gap-6rpx">
+            <view class="text-22rpx opacity-70">预估盈亏</view>
+            <view class="text-30rpx font-bold font-numeric">
               {{ summary.totalProfitLoss >= 0 ? '+' : '' }}{{ summary.totalProfitLoss }}
             </view>
           </view>
-          <view class="flex-1 pl-32rpx">
-            <!-- 替换点：原持有收益 -> 改为昨日市值 -->
-            <view class="text-24rpx opacity-70 mb-8rpx">昨日市值</view>
-            <view class="font-bold font-numeric text-36rpx truncate">
-              {{ summary.totalHoldingAmount }}
-            </view>
+
+          <view class="w-1px h-40rpx bg-white opacity-30"></view>
+
+          <!-- 3. 持仓数量 -->
+          <view class="flex-1 flex flex-col gap-6rpx">
+            <view class="text-22rpx opacity-70">持仓数量</view>
+            <view class="text-30rpx font-bold font-numeric">{{ summary.count }} 只</view>
           </view>
         </view>
       </view>
     </view>
   </view>
 
-  <!-- 2. 行情简报 (紧凑版) -->
+  <!-- 2. 行情简报 (保留原功能) -->
   <view class="ui-section mt-16rpx">
     <scroll-view scroll-x class="whitespace-nowrap w-full" enable-flex>
       <view class="flex gap-16rpx pb-8rpx">
@@ -54,107 +75,136 @@
           class="bg-white rounded-16rpx p-20rpx min-w-170rpx shadow-sm flex flex-col justify-center">
           <view class="text-24rpx text-hex-6B7280 mb-8rpx">{{ item.name }}</view>
           <view class="flex items-baseline gap-8rpx">
-            <text
+            <view
               class="text-32rpx font-bold font-numeric {{ item.changeRate >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
               {{ item.value }}
-            </text>
-            <text class="text-20rpx font-numeric {{ item.changeRate >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
+            </view>
+            <view class="text-20rpx font-numeric {{ item.changeRate >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
               {{ item.changeRate }}%
-            </text>
+            </view>
           </view>
         </view>
       </view>
     </scroll-view>
   </view>
 
-  <!-- 3. 持仓列表 (高密度布局) -->
+  <!-- 3. 持仓列表 (复刻 iOS HoldingRowView + MP 特性) -->
   <view class="px-32rpx pb-32rpx">
     <view class="flex items-center justify-between mb-24rpx mt-32rpx">
-      <text class="text-28rpx font-bold text-hex-374151">我的持仓</text>
-      <van-icon name="filter-o" size="16px" color="#9CA3AF" />
+      <view class="text-28rpx font-bold text-hex-374151">基金列表</view>
+      <!-- 简单的排序指示器 -->
+      <view class="flex items-center gap-4rpx text-20rpx text-hex-9CA3AF">
+        <view>按金额</view>
+        <van-icon name="sort" />
+      </view>
     </view>
 
     <van-empty wx:if="{{ !holdings.length }}" description="暂无持仓" />
 
     <view class="space-y-24rpx">
       <view wx:for="{{ holdings }}" wx:key="code"
-        class="bg-white rounded-24rpx shadow-sm overflow-hidden active:scale-95 transition-transform" bindtap="toDetail"
+        class="bg-white rounded-32rpx shadow-sm overflow-hidden active:scale-98 transition-transform" bindtap="toDetail"
         data-code="{{ item.code }}">
 
-        <!-- 卡片主体区域 -->
-        <view class="p-28rpx">
-          <!-- 头部：名称与代码 -->
-          <view class="flex justify-between items-start mb-24rpx">
-            <view class="flex flex-col">
-              <view class="font-bold text-hex-111827 text-28rpx truncate max-w-400rpx">{{ item.name }}</view>
-              <view class="text-20rpx text-hex-9CA3AF font-mono mt-4rpx">{{ item.code }}</view>
+        <view class="p-32rpx">
+          <!-- A. 顶部行：名称 + 板块 + 代码 -->
+          <view class="flex items-start justify-between mb-24rpx">
+            <view class="flex flex-col gap-8rpx flex-1 mr-16rpx">
+              <!-- 名称 -->
+              <view class="text-32rpx font-bold text-hex-1F2937 truncate">{{ item.name }}</view>
+
+              <!-- 辅助行：板块标签 + 代码 + 待确认胶囊 -->
+              <view class="flex flex-wrap items-center gap-8rpx">
+                <!-- 板块 Tag (仿 iOS 样式: 浅蓝底蓝字) -->
+                <view wx:if="{{ item.sectorLabel }}"
+                  class="bg-hex-EFF6FF text-hex-3B82F6 text-20rpx px-12rpx py-4rpx rounded-8rpx font-semibold">
+                  {{ item.sectorLabel }}
+                </view>
+
+                <view class="text-22rpx text-hex-9CA3AF font-mono">{{ item.code }}</view>
+
+                <!-- 待确认交易 (紧凑型) -->
+                <block wx:if="{{ item.pendingTransactions.length }}">
+                  <view wx:for="{{ item.pendingTransactions }}" wx:for-item="ptx" wx:key="id"
+                    class="text-18rpx px-8rpx py-2rpx rounded border flex items-center gap-4rpx {{ ptx.type === 'buy' ? 'bg-hex-FEF2F2 text-hex-EF4444 border-hex-FEE2E2' : 'bg-hex-F0FDF4 text-hex-22C55E border-hex-DCFCE7' }}">
+                    <van-icon name="clock-o" />
+                    <view>{{ ptx.typeLabel }}</view>
+                  </view>
+                </block>
+              </view>
             </view>
 
-            <!-- 待确认胶囊 (紧凑) -->
-            <view wx:if="{{ item.pendingTransactions.length }}" class="flex flex-col items-end gap-8rpx">
-              <view wx:for="{{ item.pendingTransactions }}" wx:for-item="ptx" wx:key="id"
-                class="text-20rpx px-12rpx py-4rpx rounded border flex items-center gap-8rpx {{ ptx.type === 'buy' ? 'bg-hex-FEF2F2 text-hex-EF4444 border-hex-FEE2E2' : 'bg-hex-F0FDF4 text-hex-22C55E border-hex-DCFCE7' }}">
-                <van-icon name="clock-o" />
-                <text>{{ ptx.typeLabel }}</text>
-              </view>
+            <!-- 右侧：今日涨跌 (最大视觉权重) -->
+            <view class="flex flex-col items-end gap-8rpx">
+              <block wx:if="{{ item.todayProfitAmount !== null && item.todayProfitAmount != 0 }}">
+                <view
+                  class="text-36rpx font-bold font-numeric {{ item.todayProfitAmount >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
+                  {{ item.todayProfitAmount >= 0 ? '+' : '' }}{{ item.todayProfitAmount }}
+                </view>
+                <!-- 涨跌幅胶囊 -->
+                <view
+                  class="px-12rpx py-4rpx rounded-full flex items-center {{ item.percentageChange >= 0 ? 'bg-hex-FEF2F2 text-hex-EF4444' : 'bg-hex-F0FDF4 text-hex-22C55E' }}">
+                  <view class="text-22rpx font-semibold">{{ item.percentageChange >= 0 ? '+' : '' }}{{
+                    item.percentageChange }}%</view>
+                </view>
+              </block>
+              <block wx:else>
+                <view class="text-36rpx font-bold text-hex-D1D5DB">--</view>
+              </block>
             </view>
           </view>
 
-          <!-- 数据三列布局 -->
-          <view class="flex items-end justify-between">
-            <!-- 1. 持有市值 (昨日) -->
-            <view class="flex-1">
-              <view class="text-20rpx text-hex-9CA3AF mb-4rpx">持有市值</view>
-              <view class="text-28rpx font-bold font-numeric text-hex-1F2937">¥{{ item.holdingAmount }}</view>
+          <!-- 分割线 -->
+          <view class="h-1px bg-hex-F3F4F6 w-full mb-24rpx"></view>
+
+          <!-- B. 数据行：持有市值 | 持有收益 -->
+          <view class="flex items-center">
+            <!-- 持有市值 -->
+            <view class="flex-1 flex flex-col gap-4rpx">
+              <view class="text-20rpx text-hex-9CA3AF">持有市值</view>
+              <view class="text-26rpx font-bold font-numeric text-hex-1F2937">¥{{ item.holdingAmount }}</view>
             </view>
 
-            <!-- 2. 持有盈亏 (列表项本身有此数据，可以展示) -->
-            <view class="flex-1 text-center border-l border-hex-F3F4F6">
-              <view class="text-20rpx text-hex-9CA3AF mb-4rpx">累计收益</view>
-              <view
-                class="text-28rpx font-bold font-numeric {{ item.holdingProfitAmount >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
-                {{ item.holdingProfitAmount >= 0 ? '+' : '' }}{{ item.holdingProfitAmount }}
+            <view class="w-1px h-24rpx bg-hex-E5E7EB mx-16rpx"></view>
+
+            <!-- 持有收益 -->
+            <view class="flex-1 flex flex-col gap-4rpx">
+              <view class="text-20rpx text-hex-9CA3AF">持有收益</view>
+              <view class="flex items-baseline gap-8rpx">
+                <view
+                  class="text-26rpx font-bold font-numeric {{ item.holdingProfitAmount >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
+                  {{ item.holdingProfitAmount >= 0 ? '+' : '' }}{{ item.holdingProfitAmount }}
+                </view>
+                <!-- 收益率 -->
+                <view class="text-20rpx {{ item.holdingProfitRate >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
+                  {{ item.holdingProfitRate >= 0 ? '+' : '' }}{{ item.holdingProfitRate }}%
+                </view>
               </view>
-            </view>
-
-            <!-- 3. 今日估算 (最重要，视觉最重) -->
-            <view class="flex-1 text-right border-l border-hex-F3F4F6 pl-16rpx">
-              <view class="text-20rpx text-hex-9CA3AF mb-4rpx">今日估算</view>
-              <block wx:if="{{ item.todayEstimateAmount !== null && item.todayEstimateAmount != 0 }}">
-                <view
-                  class="text-32rpx font-bold font-numeric {{ item.todayProfitAmount >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
-                  {{ item.todayProfitAmount >= 0 ? '+' : '' }}{{ item.todayProfitAmount }}
-                </view>
-                <view
-                  class="text-20rpx font-numeric {{ item.percentageChange >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
-                  {{ item.percentageChange >= 0 ? '+' : '' }}{{ item.percentageChange }}%
-                </view>
-              </block>
-              <view wx:else class="text-24rpx text-hex-D1D5DB italic">--</view>
             </view>
           </view>
         </view>
 
-        <!-- 卡片底部 (Footer) -->
-        <view class="bg-hex-F9FAFB px-28rpx py-16rpx flex justify-between items-center border-t border-hex-F3F4F6">
+        <!-- C. 底部 Footer：热点图与安全提示 (MP 特有功能) -->
+        <view class="bg-hex-F9FAFB px-32rpx py-16rpx flex justify-between items-center border-t border-hex-F3F4F6">
           <!-- 交易热点图 -->
-          <view class="flex items-center gap-8rpx">
+          <view class="flex items-center gap-6rpx">
             <view wx:if="{{ !item.recentTransactions.length }}" class="text-20rpx text-hex-D1D5DB">近期无交易</view>
             <view wx:for="{{ item.formattedRecentTxs }}" wx:for-item="tx" wx:key="id"
-              class="w-16rpx h-16rpx rounded-full {{ tx.colorClass }}"></view>
+              class="w-12rpx h-12rpx rounded-full {{ tx.colorClass }}"></view>
           </view>
 
           <!-- 7天安全状态 -->
           <view wx:if="{{ item.lastBuyStatus }}" class="flex items-center gap-8rpx">
             <view
-              class="w-12rpx h-12rpx rounded-full {{ item.lastBuyStatus.isSafe ? 'bg-hex-10B981' : 'bg-hex-F59E0B animate-pulse' }}">
+              class="w-10rpx h-10rpx rounded-full {{ item.lastBuyStatus.isSafe ? 'bg-hex-10B981' : 'bg-hex-F59E0B animate-pulse' }}">
             </view>
-            <text
+            <view
               class="text-20rpx font-medium {{ item.lastBuyStatus.isSafe ? 'text-hex-6B7280' : 'text-hex-F59E0B' }}">
               {{ item.lastBuyStatus.label }}
-            </text>
+            </view>
           </view>
         </view>
+
       </view>
     </view>
   </view>

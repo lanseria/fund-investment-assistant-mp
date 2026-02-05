@@ -19,7 +19,7 @@
 
     <view class="flex items-center justify-between px-2">
       <van-checkbox value="{{ rememberMe }}" bind:change="onRememberChange" checked-color="var(--theme-primary)">
-        <text class="text-sm text-gray-600">记住账号密码</text>
+        <view class="text-sm text-gray-600">记住账号密码</view>
       </van-checkbox>
     </view>
 

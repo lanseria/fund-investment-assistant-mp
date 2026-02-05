@@ -36,7 +36,7 @@
             <!-- B. 用户信息 & 资产条 -->
             <view class="flex-grow min-w-0 mr-24rpx">
               <view class="flex items-center gap-12rpx mb-12rpx">
-                <text class="font-bold text-28rpx text-hex-1F2937 truncate max-w-240rpx">{{ item.username }}</text>
+                <view class="font-bold text-28rpx text-hex-1F2937 truncate max-w-240rpx">{{ item.username }}</view>
                 <view wx:if="{{ item.isAiAgent }}"
                   class="bg-gradient-to-br from-hex-3B82F6 to-hex-A855F7 text-white text-18rpx px-10rpx py-2rpx rounded-full shadow-sm">
                   AI</view>
@@ -50,11 +50,11 @@
 
               <!-- 资产数值 -->
               <view class="flex justify-between items-center">
-                <text class="text-20rpx text-hex-9CA3AF font-mono">¥{{ item.totalAssets }}</text>
+                <view class="text-20rpx text-hex-9CA3AF font-mono">¥{{ item.totalAssets }}</view>
                 <view class="flex items-center gap-8rpx text-18rpx">
                   <view class="flex items-center gap-4rpx">
                     <view class="w-8rpx h-8rpx rounded-full bg-hex-3B82F6"></view>
-                    <text class="text-hex-6B7280">{{ item.fundPercent }}%</text>
+                    <view class="text-hex-6B7280">{{ item.fundPercent }}%</view>
                   </view>
                 </view>
               </view>
@@ -88,8 +88,8 @@
               <view wx:for="{{ userHoldings }}" wx:for-item="fund" wx:key="code"
                 class="flex justify-between items-center text-24rpx bg-white p-16rpx rounded-16rpx shadow-sm border border-hex-F3F4F6">
                 <view class="flex flex-col max-w-300rpx">
-                  <text class="text-hex-374151 font-bold truncate">{{ fund.name }}</text>
-                  <text class="text-hex-9CA3AF text-20rpx font-mono mt-4rpx">{{ fund.code }}</text>
+                  <view class="text-hex-374151 font-bold truncate">{{ fund.name }}</view>
+                  <view class="text-hex-9CA3AF text-20rpx font-mono mt-4rpx">{{ fund.code }}</view>
                 </view>
                 <view class="text-right">
                   <view class="text-hex-1F2937 font-mono font-medium">¥{{ fund.holdingAmount }}</view>

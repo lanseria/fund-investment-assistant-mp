@@ -1,5 +1,7 @@
 import request from '../../utils/request';
 import Toast from '@vant/weapp/toast/toast';
+import { loadDicts } from '../../utils/dict';
+
 
 Page({
   data: {
@@ -60,6 +62,8 @@ Page({
         } else {
           wx.removeStorageSync('saved_credentials');
         }
+        // 登录成功后并行加载字典数据
+        loadDicts();
 
         Toast.success('登录成功');
 

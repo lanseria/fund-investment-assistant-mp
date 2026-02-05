@@ -1,5 +1,6 @@
 import request from '../../utils/request';
 import { formatCurrency } from '../../utils/format';
+import { getDictLabel } from '../../utils/dict';
 import dayjs from 'dayjs';
 import Big from 'big.js';
 
@@ -32,6 +33,8 @@ Page({
           // 安全转换 Big Number
           const holdingAmt = new Big(item.holdingAmount || 0);
           const todayEstAmt = new Big(item.todayEstimateAmount || 0);
+          // 获取板块名称
+          const sectorLabel = getDictLabel('sectors', item.sector);
 
           // 计算今日盈亏: 今日预估 - 昨日市值 (holdingAmount 在此接口中代表昨日市值)
           const todayProfitAmount = todayEstAmt.minus(holdingAmt).toFixed(2);
@@ -59,6 +62,7 @@ Page({
 
           return {
             ...item,
+            sectorLabel,
             name: item.name,
             code: item.code,
             holdingAmount: formatCurrency(item.holdingAmount), // 持有市值 (昨日)
@@ -81,11 +85,11 @@ Page({
         this.setData({
           holdings: formattedHoldings,
           summary: {
-            totalEstimateAmount: formatCurrency(summaryData.totalEstimateAmount),
-            totalProfitLoss: formatCurrency(summaryData.totalProfitLoss),
-            totalPercentageChange: summaryData.totalPercentageChange ? summaryData.totalPercentageChange.toFixed(2) : '0.00',
-            // 使用昨日市值替换原来的持有收益位置
-            totalHoldingAmount: formatCurrency(summaryData.totalHoldingAmount)
+            count: res.summary.count || formattedHoldings.length,
+            totalEstimateAmount: formatCurrency(res.summary.totalEstimateAmount),
+            totalProfitLoss: formatCurrency(res.summary.totalProfitLoss),
+            totalPercentageChange: res.summary.totalPercentageChange ? res.summary.totalPercentageChange.toFixed(2) : '0.00',
+            totalHoldingAmount: formatCurrency(res.summary.totalHoldingAmount)
           }
         });
       }

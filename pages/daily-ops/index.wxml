@@ -16,8 +16,8 @@
           <van-icon name="calendar-o" color="#0D9488" size="20px" />
         </view>
         <view class="flex flex-col">
-          <text class="text-24rpx text-hex-9CA3AF">当前查看日期</text>
-          <text class="text-32rpx font-bold font-numeric text-hex-1F2937">{{ selectedDate }}</text>
+          <view class="text-24rpx text-hex-9CA3AF">当前查看日期</view>
+          <view class="text-32rpx font-bold font-numeric text-hex-1F2937">{{ selectedDate }}</view>
         </view>
       </view>
       <van-icon name="arrow-down" color="#9CA3AF" size="16px" />
@@ -35,15 +35,15 @@
         <!-- 自定义标题槽：显示用户信息和资产概览 -->
         <view slot="title" class="flex flex-col py-8rpx">
           <view class="flex items-center gap-16rpx">
-            <text class="font-bold text-28rpx text-hex-1F2937">{{ item.user.username }}</text>
+            <view class="font-bold text-28rpx text-hex-1F2937">{{ item.user.username }}</view>
             <view wx:if="{{ item.user.isAiAgent }}"
               class="bg-hex-EFF6FF text-hex-3B82F6 text-20rpx px-12rpx py-4rpx rounded border border-hex-DBEAFE">AI
             </view>
-            <text class="text-24rpx text-hex-9CA3AF">({{ item.txs.length }}笔)</text>
+            <view class="text-24rpx text-hex-9CA3AF">({{ item.txs.length }}笔)</view>
           </view>
           <view class="flex gap-24rpx mt-8rpx">
-            <text class="text-22rpx text-hex-6B7280 font-mono">资产: ¥{{ item.user.stats.totalAssets }}</text>
-            <text class="text-22rpx text-hex-6B7280 font-mono">现金: ¥{{ item.user.stats.cash }}</text>
+            <view class="text-22rpx text-hex-6B7280 font-mono">资产: ¥{{ item.user.stats.totalAssets }}</view>
+            <view class="text-22rpx text-hex-6B7280 font-mono">现金: ¥{{ item.user.stats.cash }}</view>
           </view>
         </view>
 
@@ -57,26 +57,26 @@
                   class="text-22rpx px-16rpx py-6rpx rounded-8rpx font-medium {{ tx.status === 'confirmed' ? 'bg-hex-ECFDF5 text-hex-10B981' : 'bg-hex-FFFBEB text-hex-F59E0B' }}">
                   {{ tx.typeLabel }}
                 </view>
-                <text class="font-bold text-hex-1F2937 text-28rpx truncate max-w-400rpx">{{ tx.fundName || tx.fundCode
-                  }}</text>
+                <view class="font-bold text-hex-1F2937 text-28rpx truncate max-w-400rpx">{{ tx.fundName || tx.fundCode
+                  }}</view>
               </view>
-              <text class="text-22rpx font-mono text-hex-9CA3AF">{{ tx.time }}</text>
+              <view class="text-22rpx font-mono text-hex-9CA3AF">{{ tx.time }}</view>
             </view>
 
             <!-- 详情：申报与成交 -->
             <view class="flex justify-between items-center bg-hex-F9FAFB p-20rpx rounded-16rpx">
               <view class="flex flex-col">
-                <text class="text-20rpx text-hex-9CA3AF mb-4rpx">申报详情</text>
-                <text class="text-28rpx font-mono font-medium text-hex-4B5563">{{ tx.orderDetail }}</text>
+                <view class="text-20rpx text-hex-9CA3AF mb-4rpx">申报详情</view>
+                <view class="text-28rpx font-mono font-medium text-hex-4B5563">{{ tx.orderDetail }}</view>
               </view>
 
               <view class="text-right flex flex-col items-end">
                 <block wx:if="{{ tx.status === 'confirmed' }}">
-                  <text class="text-20rpx text-hex-9CA3AF mb-4rpx">确认金额</text>
+                  <view class="text-20rpx text-hex-9CA3AF mb-4rpx">确认金额</view>
                   <view class="text-28rpx font-bold font-numeric text-hex-1F2937">¥{{ tx.confirmedAmount }}</view>
                 </block>
                 <block wx:else>
-                  <text class="text-20rpx text-hex-9CA3AF mb-4rpx">状态</text>
+                  <view class="text-20rpx text-hex-9CA3AF mb-4rpx">状态</view>
                   <view class="text-24rpx text-hex-F59E0B italic flex items-center gap-8rpx">
                     <van-loading size="12px" color="#F59E0B" /> 待确认
                   </view>
@@ -87,7 +87,7 @@
             <!-- 备注 -->
             <view wx:if="{{ tx.note }}" class="mt-16rpx text-22rpx text-hex-6B7280 italic flex items-start gap-8rpx">
               <van-icon name="comment-o" class="mt-4rpx" />
-              <text>{{ tx.note }}</text>
+              <view>{{ tx.note }}</view>
             </view>
           </view>
         </view>

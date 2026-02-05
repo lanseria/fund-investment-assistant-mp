@@ -15,7 +15,7 @@
       </view>
       <view class="ml-32rpx flex-grow">
         <view class="flex items-center gap-16rpx">
-          <text class="text-36rpx font-bold text-hex-1F2937">{{ user.username || '加载中...' }}</text>
+          <view class="text-36rpx font-bold text-hex-1F2937">{{ user.username || '加载中...' }}</view>
           <view
             class="bg-hex-F3F4F6 text-hex-4B5563 text-20rpx px-12rpx py-4rpx rounded-8rpx font-medium border border-hex-E5E7EB">
             {{ user.role }}
@@ -35,14 +35,14 @@
 
       <view class="flex items-center gap-16rpx mb-16rpx opacity-90">
         <van-icon name="balance-o" size="18px" />
-        <text class="text-26rpx font-medium">可用现金余额</text>
+        <view class="text-26rpx font-medium">可用现金余额</view>
       </view>
       <view class="text-64rpx font-bold font-numeric tracking-wide">
         ¥{{ user.availableCash }}
       </view>
       <view class="mt-24rpx text-22rpx opacity-70 flex items-center gap-8rpx">
         <van-icon name="info-o" />
-        <text>该资金用于基金买入补仓</text>
+        <view>该资金用于基金买入补仓</view>
       </view>
     </view>
   </view>
@@ -54,8 +54,8 @@
       <van-cell-group border="{{ false }}">
         <van-cell center border="{{ false }}" title-class="font-bold text-hex-1F2937">
           <view slot="title" class="flex flex-col">
-            <text class="text-30rpx">AI 自动跟投</text>
-            <text class="text-22rpx text-hex-9CA3AF mt-4rpx font-normal">每日 14:40 自动执行策略分析与交易</text>
+            <view class="text-30rpx">AI 自动跟投</view>
+            <view class="text-22rpx text-hex-9CA3AF mt-4rpx font-normal">每日 14:40 自动执行策略分析与交易</view>
           </view>
           <van-switch slot="right-icon" checked="{{ user.isAiAgent }}" size="24px" active-color="#0D9488"
             bind:change="onAiSwitchChange" disabled="{{ loading }}" />
