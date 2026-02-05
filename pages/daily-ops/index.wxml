@@ -1,98 +1,127 @@
-<view class="page-shell ui-page pb-40rpx">
-  <view class="ui-header pb-16rpx">
-    <view>
-      <view class="text-36rpx font-bold text-hex-111827">每日操作</view>
-      <view class="text-24rpx text-hex-6B7280 mt-8rpx">查看按用户分组的交易流水</view>
-    </view>
-  </view>
-
-  <!-- 1. 日期选择器 -->
-  <view class="ui-section">
+<view class="page-shell ui-page pb-40rpx min-h-screen relative">
+  <!-- 1. 顶部日期控制栏 (悬浮风格) -->
+  <view class="sticky top-0 z-10 px-24rpx py-16rpx bg-hex-F7F9FC backdrop-blur-md">
     <view
-      class="bg-white rounded-24rpx p-24rpx flex justify-between items-center shadow-sm active:bg-hex-F9FAFB transition-colors"
-      bindtap="showCalendar">
+      class="bg-white rounded-full shadow-sm p-8rpx flex items-center justify-between pl-16rpx pr-8rpx h-88rpx box-border">
+
+      <!-- 左箭头 (前一天) -->
+      <view class="w-72rpx h-72rpx flex items-center justify-center active:bg-hex-F3F4F6 rounded-full transition-colors"
+        bindtap="moveDate" data-delta="{{ -1 }}">
+        <van-icon name="arrow-left" color="#6B7280" size="18px" />
+      </view>
+
+      <!-- 中间日期显示 (点击弹日历) -->
+      <view class="flex items-center gap-12rpx px-24rpx py-8rpx active:bg-hex-F9FAFB rounded-16rpx transition-colors"
+        bindtap="showCalendar">
+        <van-icon name="calendar-o" color="#0D9488" size="18px" />
+        <view class="text-32rpx font-bold font-numeric text-hex-1F2937 pt-4rpx">{{ selectedDate }}</view>
+      </view>
+
+      <!-- 右箭头 (后一天) -->
       <view class="flex items-center gap-16rpx">
-        <view class="w-80rpx h-80rpx rounded-full bg-hex-F0FDFA flex items-center justify-center">
-          <van-icon name="calendar-o" color="#0D9488" size="20px" />
+        <!-- 回到今天按钮 (仅当不是今天时显示) -->
+        <view wx:if="{{ !isToday }}" bindtap="handleResetToday"
+          class="text-22rpx text-hex-0D9488 bg-hex-F0FDFA px-16rpx py-8rpx rounded-full border border-hex-CCFBF1 font-medium transition-opacity">
+          回今天
         </view>
-        <view class="flex flex-col">
-          <view class="text-24rpx text-hex-9CA3AF">当前查看日期</view>
-          <view class="text-32rpx font-bold font-numeric text-hex-1F2937">{{ selectedDate }}</view>
+
+        <view
+          class="w-72rpx h-72rpx flex items-center justify-center active:bg-hex-F3F4F6 rounded-full transition-colors {{ isToday ? 'opacity-30' : '' }}"
+          bindtap="moveDate" data-delta="{{ 1 }}">
+          <van-icon name="arrow" color="#6B7280" size="18px" />
         </view>
       </view>
-      <van-icon name="arrow-down" color="#9CA3AF" size="16px" />
+
     </view>
   </view>
 
-  <!-- 2. 用户分组列表 -->
-  <view class="ui-section mt-24rpx">
-    <van-empty wx:if="{{ !groupedTransactions.length }}" description="该日暂无操作记录" />
+  <!-- 2. 内容区域 -->
+  <view class="px-24rpx mt-16rpx">
 
-    <van-collapse value="{{ activeNames }}" bind:change="onCollapseChange" border="{{ false }}">
-      <van-collapse-item wx:for="{{ groupedTransactions }}" wx:key="username" name="{{ item.user.username }}"
-        custom-class="mb-24rpx rounded-24rpx overflow-hidden shadow-sm bg-white" content-class="!p-0">
+    <!-- 加载中 -->
+    <view wx:if="{{ loading }}" class="flex flex-col items-center justify-center py-100rpx">
+      <van-loading color="#0D9488" size="32px" vertical>加载记录中...</van-loading>
+    </view>
 
-        <!-- 自定义标题槽：显示用户信息和资产概览 -->
-        <view slot="title" class="flex flex-col py-8rpx">
+    <!-- 空状态 -->
+    <view wx:elif="{{ !groupedTransactions.length }}"
+      class="flex flex-col items-center justify-center pt-120rpx opacity-60">
+      <view class="w-160rpx h-160rpx bg-hex-E5E7EB rounded-full flex items-center justify-center mb-32rpx">
+        <van-icon name="description" size="48px" color="#9CA3AF" />
+      </view>
+      <view class="text-30rpx text-hex-6B7280 font-medium">该日暂无操作记录</view>
+      <view class="mt-24rpx">
+        <van-button wx:if="{{ !isToday }}" round type="primary" size="small" color="#0D9488"
+          bind:click="handleResetToday">查看今天</van-button>
+      </view>
+    </view>
+
+    <!-- 列表流 (LazyVStack 风格) -->
+    <view wx:else class="flex flex-col gap-40rpx pb-60rpx">
+      <view wx:for="{{ groupedTransactions }}" wx:for-item="group" wx:key="username" class="flex flex-col gap-24rpx">
+
+        <!-- 分组标题 (Section Header) -->
+        <view class="flex items-center justify-between px-8rpx">
           <view class="flex items-center gap-16rpx">
-            <view class="font-bold text-28rpx text-hex-1F2937">{{ item.user.username }}</view>
-            <view wx:if="{{ item.user.isAiAgent }}"
-              class="bg-hex-EFF6FF text-hex-3B82F6 text-20rpx px-12rpx py-4rpx rounded border border-hex-DBEAFE">AI
+            <van-icon name="manager" color="#3B82F6" size="20px" />
+            <view class="text-30rpx font-bold text-hex-1F2937">{{ group.user.username }}</view>
+            <view wx:if="{{ group.user.isAiAgent }}"
+              class="bg-hex-EFF6FF text-hex-3B82F6 text-18rpx px-8rpx py-2rpx rounded border border-hex-DBEAFE">AI
             </view>
-            <view class="text-24rpx text-hex-9CA3AF">({{ item.txs.length }}笔)</view>
           </view>
-          <view class="flex gap-24rpx mt-8rpx">
-            <view class="text-22rpx text-hex-6B7280 font-mono">资产: ¥{{ item.user.stats.totalAssets }}</view>
-            <view class="text-22rpx text-hex-6B7280 font-mono">现金: ¥{{ item.user.stats.cash }}</view>
+          <view class="bg-hex-F3F4F6 text-hex-6B7280 text-20rpx px-12rpx py-4rpx rounded-8rpx font-medium">
+            {{ group.txs.length }} 笔操作
           </view>
         </view>
 
-        <!-- 内部交易列表 -->
-        <view class="divide-y divide-hex-F3F4F6">
-          <view wx:for="{{ item.txs }}" wx:for-item="tx" wx:key="id" class="p-32rpx bg-white">
-            <!-- 头部：类型与时间 -->
-            <view class="flex justify-between items-center mb-16rpx">
-              <view class="flex items-center gap-16rpx">
-                <view
-                  class="text-22rpx px-16rpx py-6rpx rounded-8rpx font-medium {{ tx.status === 'confirmed' ? 'bg-hex-ECFDF5 text-hex-10B981' : 'bg-hex-FFFBEB text-hex-F59E0B' }}">
-                  {{ tx.typeLabel }}
-                </view>
-                <view class="font-bold text-hex-1F2937 text-28rpx truncate max-w-400rpx">{{ tx.fundName || tx.fundCode
-                  }}</view>
-              </view>
-              <view class="text-22rpx font-mono text-hex-9CA3AF">{{ tx.time }}</view>
-            </view>
+        <!-- 卡片列表 -->
+        <view class="flex flex-col gap-24rpx">
+          <view wx:for="{{ group.txs }}" wx:for-item="tx" wx:key="id"
+            class="bg-white rounded-32rpx p-32rpx shadow-sm flex items-center justify-between active:scale-98 transition-transform">
 
-            <!-- 详情：申报与成交 -->
-            <view class="flex justify-between items-center bg-hex-F9FAFB p-20rpx rounded-16rpx">
-              <view class="flex flex-col">
-                <view class="text-20rpx text-hex-9CA3AF mb-4rpx">申报详情</view>
-                <view class="text-28rpx font-mono font-medium text-hex-4B5563">{{ tx.orderDetail }}</view>
+            <!-- 左侧：图标 + 信息 -->
+            <view class="flex items-center gap-24rpx flex-1 min-w-0 mr-16rpx">
+              <!-- 圆形图标底座 -->
+              <view
+                class="w-96rpx h-96rpx rounded-full {{ tx.theme.bg }} flex items-center justify-center flex-shrink-0">
+                <van-icon name="{{ tx.theme.icon }}" color="{{ tx.theme.hex }}" size="20px" />
               </view>
 
-              <view class="text-right flex flex-col items-end">
-                <block wx:if="{{ tx.status === 'confirmed' }}">
-                  <view class="text-20rpx text-hex-9CA3AF mb-4rpx">确认金额</view>
-                  <view class="text-28rpx font-bold font-numeric text-hex-1F2937">¥{{ tx.confirmedAmount }}</view>
-                </block>
-                <block wx:else>
-                  <view class="text-20rpx text-hex-9CA3AF mb-4rpx">状态</view>
-                  <view class="text-24rpx text-hex-F59E0B italic flex items-center gap-8rpx">
-                    <van-loading size="12px" color="#F59E0B" /> 待确认
+              <!-- 中间文本 -->
+              <view class="flex flex-col gap-8rpx flex-1 min-w-0">
+                <view class="text-30rpx font-bold text-hex-1F2937 truncate">{{ tx.fundName || tx.fundCode }}</view>
+
+                <view class="flex items-center gap-12rpx">
+                  <!-- 类型标签 -->
+                  <view
+                    class="text-20rpx font-bold px-10rpx py-4rpx rounded-8rpx {{ tx.theme.bg }} {{ tx.theme.color }}">
+                    {{ tx.theme.label }}
                   </view>
-                </block>
+
+                  <!-- 备注或时间 -->
+                  <view class="text-24rpx text-hex-9CA3AF truncate max-w-200rpx">
+                    {{ tx.note || tx.time }}
+                  </view>
+                </view>
               </view>
             </view>
 
-            <!-- 备注 -->
-            <view wx:if="{{ tx.note }}" class="mt-16rpx text-22rpx text-hex-6B7280 italic flex items-start gap-8rpx">
-              <van-icon name="comment-o" class="mt-4rpx" />
-              <view>{{ tx.note }}</view>
+            <!-- 右侧：金额 + 状态 -->
+            <view class="flex flex-col items-end gap-4rpx flex-shrink-0">
+              <view class="text-34rpx font-bold font-numeric {{ tx.theme.color }}">
+                {{ tx.mainUnit === '¥' ? '¥' : '' }}{{ tx.mainValue }}<text wx:if="{{ tx.mainUnit === '份' }}"
+                  class="text-24rpx ml-4rpx">份</text>
+              </view>
+              <view class="text-22rpx {{ tx.statusColor }}">
+                {{ tx.statusText }}
+              </view>
             </view>
+
           </view>
         </view>
-      </van-collapse-item>
-    </van-collapse>
+
+      </view>
+    </view>
   </view>
 
   <!-- 3. 日历弹窗 -->

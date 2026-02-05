@@ -9,10 +9,11 @@ export default defineConfig({
       patterns: [
         // 1. 你的原有包含规则
         '{pages,components}/**/*.wxml',
-        'custom-tab-bar/*.wxml',
+        '{pages,components}/**/*.js',
 
         // 这里的 ** 导致了扫描 node_modules，我们在下面排除它
         '**/components/**/*.wxml',
+        '**/components/**/*.js',
 
         // 2. 新增：排除规则 (必须以 ! 开头)
         '!node_modules/**/*',
@@ -24,7 +25,7 @@ export default defineConfig({
   },
   content: {
     pipeline: {
-      include: [/\.wxml$/]
+      include: [/\.wxml$/, /\.js$/],
     }
   },
   theme: {
@@ -44,11 +45,5 @@ export default defineConfig({
     // 定义快捷类，方便搬运 Web 端的逻辑
     ['btn-primary', 'bg-hex-0D9488 text-white rounded-md'],
   ],
-  separators: '__',
-  safelist: [
-    'bg-hex-EF4444',
-    'bg-hex-22C55E',
-    'bg-hex-A855F7',
-    'bg-hex-3B82F6',
-  ]
+  separators: '__'
 })
