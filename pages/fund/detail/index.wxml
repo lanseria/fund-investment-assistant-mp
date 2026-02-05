@@ -1,0 +1,180 @@
+<view class="page-shell ui-page pb-180rpx relative min-h-screen">
+
+  <view wx:if="{{ loading }}" class="flex justify-center pt-100rpx">
+    <van-loading size="32px" color="#0D9488" vertical>加载详情中...</van-loading>
+  </view>
+
+  <block wx:else>
+    <!-- 1. 顶部标题区 -->
+    <view class="flex flex-col items-center py-20rpx">
+      <view class="text-36rpx font-bold text-hex-1F2937 text-center px-40rpx leading-tight">
+        {{ holding.name }}
+      </view>
+      <view class="flex items-center gap-12rpx mt-8rpx text-24rpx text-hex-6B7280">
+        <view class="font-mono bg-hex-F3F4F6 px-8rpx py-2rpx rounded">{{ holding.code }}</view>
+        <view wx:if="{{ holding.sectorLabel }}">•</view>
+        <view wx:if="{{ holding.sectorLabel }}">{{ holding.sectorLabel }}</view>
+      </view>
+    </view>
+
+    <!-- 2. 核心资产卡片 -->
+    <view class="px-32rpx mt-10rpx">
+      <view class="relative rounded-40rpx overflow-hidden shadow-lg border border-white">
+        <!-- 动态背景色：根据涨跌显示淡淡的红/绿晕 -->
+        <view class="absolute inset-0 opacity-10 {{ changeColorClass.bg }}"></view>
+
+        <view class="relative z-10 p-40rpx flex flex-col items-center">
+          <!-- 上半部分：预估盈亏/涨跌 -->
+          <view class="text-24rpx font-medium text-hex-6B7280 mb-8rpx">
+            {{ hasHolding ? '今日预估盈亏' : '今日涨跌幅' }}
+          </view>
+
+          <!-- 大数字展示 -->
+          <block wx:if="{{ hasHolding }}">
+            <view class="text-84rpx font-bold font-numeric leading-none {{ changeColorClass.text }}">
+              {{ estimatedDayProfit >= 0 ? '+' : '' }}{{ estimatedDayProfit }}
+            </view>
+            <!-- 下方小胶囊：涨跌幅 -->
+            <view
+              class="mt-16rpx flex items-center gap-4rpx px-20rpx py-6rpx rounded-full {{ changeColorClass.lightBg }}">
+              <van-icon name="{{ holding.percentageChange >= 0 ? 'ascending' : 'descending' }}" size="12px"
+                color="{{ changeColorClass.hex }}" />
+              <view class="text-28rpx font-bold font-numeric {{ changeColorClass.text }}">
+                {{ holding.percentageChange >= 0 ? '+' : '' }}{{ holding.percentageChange }}%
+              </view>
+            </view>
+          </block>
+
+          <block wx:else>
+            <view class="text-84rpx font-bold font-numeric leading-none {{ changeColorClass.text }}">
+              {{ holding.percentageChange >= 0 ? '+' : '' }}{{ holding.percentageChange }}%
+            </view>
+          </block>
+
+          <!-- 分割线 -->
+          <view class="w-full h-1px bg-black opacity-5 my-40rpx"></view>
+
+          <!-- 下半部分：三列数据网格 -->
+          <view class="w-full flex justify-between items-start">
+            <!-- 列1 -->
+            <view class="flex-1 flex flex-col items-center gap-8rpx border-r border-hex-E5E7EB">
+              <view class="text-22rpx text-hex-6B7280">持有资产</view>
+              <view class="text-32rpx font-bold font-numeric text-hex-1F2937">
+                {{ hasHolding ? holding.holdingAmount : '--' }}
+              </view>
+            </view>
+
+            <!-- 列2 -->
+            <view class="flex-1 flex flex-col items-center gap-8rpx border-r border-hex-E5E7EB">
+              <view class="text-22rpx text-hex-6B7280">持有收益</view>
+              <view
+                class="text-32rpx font-bold font-numeric {{ holding.holdingProfitRate >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
+                {{ hasHolding ? (holding.holdingProfitRate + '%') : '--' }}
+              </view>
+            </view>
+
+            <!-- 列3 -->
+            <view class="flex-1 flex flex-col items-center gap-8rpx">
+              <view class="text-22rpx text-hex-6B7280">预估净值</view>
+              <view class="flex flex-col items-center">
+                <view class="text-32rpx font-bold font-numeric text-hex-1F2937">{{ holding.currentNav }}</view>
+                <view class="text-18rpx px-8rpx py-2rpx bg-hex-F3F4F6 text-hex-9CA3AF rounded-4rpx mt-4rpx">
+                  {{ holding.isEstimateRealtime ? '实时' : '昨日' }}
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 3. 图表卡片 (Canvas) -->
+    <view class="px-32rpx mt-32rpx">
+      <view class="bg-white rounded-40rpx p-32rpx shadow-sm">
+        <!-- 图表头部：标题 + 动态数据 + 周期切换 -->
+        <view class="flex justify-between items-start mb-32rpx">
+          <view class="flex flex-col">
+            <view class="text-30rpx font-bold text-hex-1F2937">历史走势</view>
+            <!-- 动态显示选中值或最新值 -->
+            <view class="text-24rpx text-hex-6B7280 font-mono mt-4rpx">
+              <block wx:if="{{ chartSelection }}">
+                {{ chartSelection.date }} 净值: {{ chartSelection.nav }}
+              </block>
+              <block wx:else>
+                最新净值: {{ holding.currentNav }}
+              </block>
+            </view>
+          </view>
+
+          <!-- 周期选择器 -->
+          <view class="flex bg-hex-F3F4F6 rounded-16rpx p-4rpx">
+            <view wx:for="{{ timeRanges }}" wx:key="value" bindtap="onRangeChange" data-range="{{ item.value }}"
+              class="text-22rpx px-20rpx py-8rpx rounded-12rpx transition-all {{ activeRange === item.value ? 'bg-white text-hex-0D9488 shadow-sm font-bold' : 'text-hex-6B7280' }}">
+              {{ item.label }}
+            </view>
+          </view>
+        </view>
+
+        <!-- Canvas 区域 -->
+        <view class="w-full h-400rpx relative">
+          <canvas type="2d" id="historyChart" class="w-full h-400rpx" bindtouchstart="onChartTouch"
+            bindtouchmove="onChartTouch" bindtouchend="onChartTouchEnd"></canvas>
+
+          <!-- 加载中遮罩 -->
+          <view wx:if="{{ chartLoading }}"
+            class="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center z-10">
+            <van-loading size="24px" color="#0D9488" />
+          </view>
+          <!-- 无数据 -->
+          <view wx:if="{{ !chartLoading && !chartData.length }}"
+            class="absolute inset-0 flex items-center justify-center text-hex-9CA3AF text-24rpx">
+            暂无走势数据
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 4. 业绩指标卡片 -->
+    <view class="px-32rpx mt-32rpx">
+      <view class="bg-white rounded-40rpx p-32rpx shadow-sm">
+        <view class="flex items-center gap-16rpx mb-24rpx">
+          <van-icon name="chart-trending-o" color="#F97316" size="18px" />
+          <view class="text-30rpx font-bold text-hex-1F2937">阶段涨跌</view>
+        </view>
+
+        <!-- Grid Layout for Performance -->
+        <view class="grid grid-cols-3 gap-24rpx">
+          <block wx:for="{{ performanceItems }}" wx:key="label">
+            <view class="bg-hex-F9FAFB rounded-24rpx py-24rpx flex flex-col items-center">
+              <view class="text-22rpx text-hex-6B7280 mb-8rpx">{{ item.label }}</view>
+              <view
+                class="text-30rpx font-bold font-numeric {{ item.value >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
+                {{ item.value >= 0 ? '+' : '' }}{{ item.value }}%
+              </view>
+            </view>
+          </block>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 底部悬浮操作栏 -->
+  <view
+    class="fixed bottom-0 left-0 right-0 bg-white border-t border-hex-F3F4F6 pb-env-safe pt-24rpx px-32rpx shadow-[0_-4px_12px_rgba(0,0,0,0.05)] z-50">
+    <view class="h-100rpx"> <!-- 占位高度 -->
+      <van-button block round color="#3B82F6" icon="edit" custom-class="!h-88rpx !text-32rpx !shadow-lg shadow-blue-200"
+        bind:click="openTradeSheet">
+        记账 / 交易
+      </van-button>
+    </view>
+  </view>
+
+  <!-- 交易弹窗 (占位) -->
+  <van-popup show="{{ showTradeSheet }}" position="bottom" round bind:close="closeTradeSheet">
+    <view class="p-40rpx h-600rpx flex flex-col items-center justify-center">
+      <view class="text-32rpx text-hex-374151">交易功能模块待接入</view>
+    </view>
+  </van-popup>
+
+  <van-toast id="van-toast" />
+</view>

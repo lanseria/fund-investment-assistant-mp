@@ -4,7 +4,8 @@
     "pages/daily-ops/index",
     "pages/leaderboard/index",
     "pages/profile/index",
-    "pages/login/login"
+    "pages/login/login",
+    "pages/fund/detail/index"
   ],
   "usingComponents": {
     "van-tag": "@vant/weapp/tag/index",
