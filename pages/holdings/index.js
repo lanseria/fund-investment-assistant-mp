@@ -15,6 +15,7 @@ Page({
       totalHoldingAmount: '0.00' // 新增：昨日市值
     },
     indices: [],
+    filterHeld: false,
     sortBy: 'holdingAmount',
     sortOrder: 'desc'
   },
@@ -119,7 +120,15 @@ Page({
   },
 
   getSortedHoldings(list) {
-    const { sortBy, sortOrder } = this.data;
+    const { sortBy, sortOrder, filterHeld } = this.data;
+
+    // 1. 过滤逻辑：如果开启了"仅看持仓"，则排除 isWatchOnly 为 true 的项
+    let result = list;
+    if (filterHeld) {
+      result = list.filter(item => !item.isWatchOnly);
+    }
+
+    // 2. 排序逻辑
     const factor = sortOrder === 'asc' ? 1 : -1;
     const getValue = (item) => {
       switch (sortBy) {
@@ -133,9 +142,10 @@ Page({
       }
     };
 
-    return [...list].sort((a, b) => {
+    return [...result].sort((a, b) => {
       const diff = getValue(a) - getValue(b);
       if (diff !== 0) return diff * factor;
+      // 次级排序始终按金额
       return (Number(a.holdingAmountRaw || 0) - Number(b.holdingAmountRaw || 0)) * factor;
     });
   },
@@ -143,6 +153,7 @@ Page({
   onSortTap(e) {
     const { sort } = e.currentTarget.dataset;
     let sortOrder = 'desc';
+    // 如果点击当前排序字段，则反转顺序；否则重置为降序
     if (this.data.sortBy === sort) {
       sortOrder = this.data.sortOrder === 'desc' ? 'asc' : 'desc';
     }
@@ -150,6 +161,18 @@ Page({
       sortBy: sort,
       sortOrder,
       holdings: this.getSortedHoldings(this.data.holdingsRaw)
+    });
+  },
+
+  // 新增：切换"仅看持仓"状态
+  onFilterHeldTap() {
+    this.setData({ filterHeld: !this.data.filterHeld }, () => {
+      const sorted = this.getSortedHoldings(this.data.holdingsRaw);
+      this.setData({ holdings: sorted });
+
+      if (this.data.filterHeld) {
+        wx.showToast({ title: '已隐藏自选', icon: 'none' });
+      }
     });
   },
 
