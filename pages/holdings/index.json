@@ -1,3 +1,5 @@
 {
-  "usingComponents": {}
+  "usingComponents": {
+    "fund-card": "/components/fund-card/index"
+  }
 }

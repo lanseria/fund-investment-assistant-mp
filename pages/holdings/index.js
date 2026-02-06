@@ -191,7 +191,8 @@ Page({
   },
 
   toDetail(e) {
-    const { code } = e.currentTarget.dataset;
+    // 兼容两种方式：直接点击(currentTarget) 或 组件事件(detail)
+    const code = e.detail.code || e.currentTarget.dataset.code;
 
     // 1. 从原始数据中查找，以获取未经格式化的数值
     const rawItem = this.data.holdingsRaw.find(item => item.code === code);

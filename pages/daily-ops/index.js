@@ -145,7 +145,7 @@ Page({
         };
       case 'sell':
         return {
-          icon: 'up', // 箭头向上（出库/卖出）
+          icon: 'cart-o', // 箭头向上（出库/卖出）
           color: 'text-hex-22C55E',
           bg: 'bg-hex-F0FDF4',
           hex: '#22C55E',

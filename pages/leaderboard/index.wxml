@@ -16,7 +16,7 @@
 
     <van-empty wx:if="{{ !loading && !leaderboard.length }}" description="暂无排行数据" />
 
-    <view wx:else class="space-y-20rpx">
+    <view wx:else class="flex flex-col gap-16rpx">
       <block wx:for="{{ leaderboard }}" wx:key="id">
         <view class="bg-white rounded-24rpx shadow-sm overflow-hidden">
           <!-- 用户主行 -->
@@ -85,22 +85,14 @@
               <van-loading size="16px" color="#0D9488" />
             </view>
             <view wx:else class="space-y-16rpx">
-              <view wx:for="{{ userHoldings }}" wx:for-item="fund" wx:key="code"
-                class="flex justify-between items-center text-24rpx bg-white p-16rpx rounded-16rpx shadow-sm border border-hex-F3F4F6">
-                <view class="flex flex-col max-w-300rpx">
-                  <view class="text-hex-374151 font-bold truncate">{{ fund.name }}</view>
-                  <view class="text-hex-9CA3AF text-20rpx font-mono mt-4rpx">{{ fund.code }}</view>
-                </view>
-                <view class="text-right">
-                  <view class="text-hex-1F2937 font-mono font-medium">¥{{ fund.holdingAmount }}</view>
-                  <view
-                    class="text-20rpx font-numeric mt-2rpx {{ fund.holdingProfitRate >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
-                    {{ fund.holdingProfitRate > 0 ? '+' : '' }}{{ fund.holdingProfitRate }}%
-                  </view>
-                </view>
-              </view>
+              <!-- 使用 Fund Card 组件 -->
+              <block wx:for="{{ userHoldings }}" wx:for-item="fund" wx:key="code">
+                <fund-card fund="{{ fund }}" />
+              </block>
+
               <view wx:if="{{ !userHoldings.length }}" class="text-center text-hex-9CA3AF text-20rpx py-8rpx">
-                暂无公开持仓或持仓隐藏</view>
+                暂无公开持仓或持仓隐藏
+              </view>
             </view>
           </view>
         </view>

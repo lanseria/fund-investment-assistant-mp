@@ -9,7 +9,7 @@
   </view>
 
   <!-- 表单区域 -->
-  <view class="w-full bg-white rounded-2xl shadow-sm p-4 space-y-4">
+  <view class="w-full bg-white rounded-2xl shadow-sm p-4 flex flex-col gap-4">
     <van-field value="{{ username }}" label="用户名" placeholder="请输入用户名" left-icon="user-o" border="{{ false }}"
       bind:change="onUsernameChange" custom-style="background: #f9fafb; border-radius: 12px; margin-bottom: 16px;" />
 
