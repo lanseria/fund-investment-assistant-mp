@@ -1,9 +1,7 @@
 <view class="min-h-screen bg-gray-50 flex flex-col items-center p-6">
   <!-- Logo 区域 -->
   <view class="mt-20 mb-10 flex flex-col items-center">
-    <view class="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center shadow-lg">
-      <van-icon name="finance-asset" color="#ffffff" size="40px" />
-    </view>
+    <image src="/static/logo.png" mode="widthFix" class="w-20 h-20  rounded-2xl shadow-lg" />
     <view class="mt-4 text-2xl font-bold text-gray-800">基金投资助手</view>
     <view class="mt-1 text-sm text-gray-500">欢迎回来，请登录您的账户</view>
   </view>
