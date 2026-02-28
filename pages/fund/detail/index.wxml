@@ -1,4 +1,5 @@
-<view class="page-shell ui-page pb-180rpx relative min-h-screen">
+<view class="page-shell ui-page pb-180rpx relative min-h-screen"
+  style="padding-bottom: calc(180rpx + env(safe-area-inset-bottom))">
 
   <view wx:if="{{ loading }}" class="flex justify-center pt-100rpx">
     <van-loading size="32px" color="#0D9488" vertical>加载详情中...</van-loading>
@@ -95,14 +96,9 @@
         <view class="flex justify-between items-start mb-32rpx">
           <view class="flex flex-col">
             <view class="text-30rpx font-bold text-hex-1F2937">历史走势</view>
-            <!-- 动态显示选中值或最新值 -->
+            <!-- 最新净值 -->
             <view class="text-24rpx text-hex-6B7280 font-mono mt-4rpx">
-              <block wx:if="{{ chartSelection }}">
-                {{ chartSelection.date }} 净值: {{ chartSelection.nav }}
-              </block>
-              <block wx:else>
-                最新净值: {{ holding.currentNav }}
-              </block>
+              最新净值: {{ holding.currentNav }}
             </view>
           </view>
 
@@ -117,8 +113,7 @@
 
         <!-- Canvas 区域 -->
         <view class="w-full h-400rpx relative">
-          <canvas type="2d" id="historyChart" class="w-full h-400rpx" bindtouchstart="onChartTouch"
-            bindtouchmove="onChartTouch" bindtouchend="onChartTouchEnd"></canvas>
+          <canvas type="2d" id="historyChart" class="w-full h-400rpx"></canvas>
 
           <!-- 加载中遮罩 -->
           <view wx:if="{{ chartLoading }}"
@@ -162,18 +157,67 @@
   <view
     class="fixed bottom-0 left-0 right-0 bg-white border-t border-hex-F3F4F6 pb-env-safe pt-24rpx px-32rpx shadow-[0_-4px_12px_rgba(0,0,0,0.05)] z-50">
     <view class="h-100rpx"> <!-- 占位高度 -->
-      <van-button block round color="#3B82F6" icon="edit" custom-class="!h-88rpx !text-32rpx !shadow-lg shadow-blue-200"
+      <van-button block round color="#0D9488" icon="edit" custom-class="!h-88rpx !text-32rpx !shadow-lg shadow-teal-200"
         bind:click="openTradeSheet">
         记账 / 交易
       </van-button>
     </view>
   </view>
 
-  <!-- 交易弹窗 (占位) -->
-  <van-popup show="{{ showTradeSheet }}" position="bottom" round bind:close="closeTradeSheet">
-    <view class="p-40rpx h-600rpx flex flex-col items-center justify-center">
-      <view class="text-32rpx text-hex-374151">交易功能模块待接入</view>
+  <!-- 交易记录/记一笔 悬浮抽屉 -->
+  <van-popup show="{{ showTradeSheet }}" position="bottom" round bind:close="closeTradeSheet"
+    custom-style="min-height: 40vh; max-height: 85vh; display: flex; flex-direction: column; background-color: #F9FAFB;">
+    <!-- 头部标题 -->
+    <view class="text-center py-32rpx text-32rpx font-bold text-hex-1F2937 border-b border-hex-E5E7EB bg-white">记一笔
     </view>
+    <scroll-view scroll-y class="flex-1">
+      <view class="p-40rpx flex flex-col gap-40rpx">
+        <!-- 交易类型 -->
+        <view class="flex flex-col gap-16rpx">
+          <view class="text-28rpx font-bold text-hex-374151">交易类型</view>
+          <van-radio-group value="{{ tradeForm.type }}" bind:change="onTradeTypeChange" direction="horizontal">
+            <van-radio name="buy" checked-color="#EF4444" custom-class="mr-48rpx">买入</van-radio>
+            <van-radio name="sell" checked-color="#22C55E">卖出</van-radio>
+          </van-radio-group>
+        </view>
+
+        <!-- 金额/份额 -->
+        <view class="flex flex-col gap-16rpx">
+          <view class="text-28rpx font-bold text-hex-374151">{{ tradeForm.type === 'buy' ? '买入金额 (元)' : '卖出份额 (份)' }}
+          </view>
+          <view class="bg-white rounded-16rpx px-24rpx py-24rpx shadow-sm border border-hex-F3F4F6">
+            <input type="digit" placeholder="{{ tradeForm.type === 'buy' ? '请输入金额' : '请输入份额' }}"
+              model:value="{{ tradeForm.amountOrShares }}" class="text-36rpx font-numeric w-full text-hex-1F2937"
+              placeholder-class="text-hex-9CA3AF text-30rpx font-sans" />
+          </view>
+        </view>
+
+        <!-- 交易日期 -->
+        <view class="flex flex-col gap-16rpx">
+          <view class="text-28rpx font-bold text-hex-374151">交易日期</view>
+          <view
+            class="bg-white rounded-16rpx px-24rpx py-24rpx shadow-sm border border-hex-F3F4F6 flex justify-between items-center active:bg-hex-F9FAFB transition-colors"
+            bindtap="openDatePicker">
+            <view class="text-32rpx font-numeric {{ tradeForm.date ? 'text-hex-1F2937' : 'text-hex-9CA3AF' }}">{{
+              tradeForm.date || '请选择日期' }}</view>
+            <van-icon name="calendar-o" color="#9CA3AF" size="18px" />
+          </view>
+        </view>
+
+        <!-- 提交按钮 -->
+        <van-button block color="#0D9488"
+          custom-class="!rounded-24rpx !h-96rpx !text-32rpx mt-24rpx !font-bold shadow-lg shadow-teal-200"
+          loading="{{ submitting }}" bind:click="submitTransaction">
+          确认提交
+        </van-button>
+      </view>
+    </scroll-view>
+  </van-popup>
+
+  <!-- 日期选择弹窗 -->
+  <van-popup show="{{ showDatePicker }}" position="bottom" bind:close="closeDatePicker" z-index="2000" round>
+    <van-datetime-picker type="date" value="{{ currentDate }}" max-date="{{ maxDate }}" bind:confirm="onDateConfirm"
+      bind:cancel="closeDatePicker" active-class="text-hex-0D9488" toolbar-class="text-hex-0D9488" />
   </van-popup>
 
   <van-toast id="van-toast" />

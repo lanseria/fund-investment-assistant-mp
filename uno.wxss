@@ -33,6 +33,7 @@ page,root-portal-content,::before,::after{--un-rotate:0;--un-rotate-x:0;--un-rot
 .ml-4rpx{margin-left:4rpx;}
 .mr-16rpx{margin-right:16rpx;}
 .mr-24rpx{margin-right:24rpx;}
+.mr-48rpx{margin-right:48rpx;}
 .mr-4rpx{margin-right:4rpx;}
 .mt-1,
 .mt-8rpx{margin-top:8rpx;}
@@ -49,6 +50,7 @@ page,root-portal-content,::before,::after{--un-rotate:0;--un-rotate-x:0;--un-rot
 .box-border{box-sizing:border-box;}
 .block{display:block;}
 ._el_h-88rpx{height:88rpx!important;}
+._el_h-96rpx{height:96rpx!important;}
 .h-100rpx{height:100rpx;}
 .h-10rpx{height:10rpx;}
 .h-120rpx{height:120rpx;}
@@ -62,7 +64,6 @@ page,root-portal-content,::before,::after{--un-rotate:0;--un-rotate-x:0;--un-rot
 .h-400rpx{height:400rpx;}
 .h-40rpx{height:40rpx;}
 .h-48rpx{height:48rpx;}
-.h-600rpx{height:600rpx;}
 .h-72rpx{height:72rpx;}
 .h-88rpx{height:88rpx;}
 .h-8rpx{height:8rpx;}
@@ -117,6 +118,7 @@ page,root-portal-content,::before,::after{--un-rotate:0;--un-rotate-x:0;--un-rot
 .whitespace-nowrap{white-space:nowrap;}
 .border{border-width:1px;}
 .border-4rpx{border-width:4rpx;}
+.border-b{border-bottom-width:1px;}
 .border-r{border-right-width:1px;}
 .border-t{border-top-width:1px;}
 .border-hex-0D9488{--un-border-opacity:1;border-color:rgba(13,148,136,var(--un-border-opacity));}
@@ -128,6 +130,7 @@ page,root-portal-content,::before,::after{--un-rotate:0;--un-rotate-x:0;--un-rot
 .border-hex-F3F4F6{--un-border-opacity:1;border-color:rgba(243,244,246,var(--un-border-opacity));}
 .border-hex-FEE2E2{--un-border-opacity:1;border-color:rgba(254,226,226,var(--un-border-opacity));}
 .border-white{--un-border-opacity:1;border-color:rgba(255,255,255,var(--un-border-opacity));}
+._el_rounded-24rpx{border-radius:24rpx!important;}
 .rounded,
 .rounded-8rpx{border-radius:8rpx;}
 .rounded-12rpx{border-radius:12rpx;}
@@ -190,6 +193,7 @@ page,root-portal-content,::before,::after{--un-rotate:0;--un-rotate-x:0;--un-rot
 .py-20rpx{padding-top:20rpx;padding-bottom:20rpx;}
 .py-24rpx{padding-top:24rpx;padding-bottom:24rpx;}
 .py-2rpx{padding-top:2rpx;padding-bottom:2rpx;}
+.py-32rpx{padding-top:32rpx;padding-bottom:32rpx;}
 .py-4rpx{padding-top:4rpx;padding-bottom:4rpx;}
 .py-6rpx{padding-top:6rpx;padding-bottom:6rpx;}
 .py-80rpx{padding-top:80rpx;padding-bottom:80rpx;}
@@ -243,6 +247,7 @@ page,root-portal-content,::before,::after{--un-rotate:0;--un-rotate-x:0;--un-rot
 .text-hex-F59E0B{--un-text-opacity:1;color:rgba(245,158,11,var(--un-text-opacity)) ;}
 .text-hex-F97316{--un-text-opacity:1;color:rgba(249,115,22,var(--un-text-opacity)) ;}
 .text-white{--un-text-opacity:1;color:rgba(255,255,255,var(--un-text-opacity)) ;}
+._el_font-bold{font-weight:700!important;}
 .font-bold{font-weight:700;}
 .font-medium{font-weight:500;}
 .font-normal{font-weight:400;}
@@ -252,6 +257,7 @@ page,root-portal-content,::before,::after{--un-rotate:0;--un-rotate-x:0;--un-rot
 .tracking-tight{letter-spacing:-.025em;}
 .tracking-wide{letter-spacing:.025em;}
 .font-mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;}
+.font-sans{font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Noto Sans,Ubuntu,Cantarell,Helvetica Neue,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;}
 .opacity-10{opacity:.1;}
 .opacity-20{opacity:.2;}
 .opacity-30{opacity:.3;}
@@ -262,10 +268,10 @@ page,root-portal-content,::before,::after{--un-rotate:0;--un-rotate-x:0;--un-rot
 .opacity-90{opacity:.9;}
 ._el_shadow-lg{--un-shadow:var(--un-shadow-inset) 0 10px 15px -3px var(--un-shadow-color, rgb(0 0 0 / 0.1)),var(--un-shadow-inset) 0 4px 6px -4px var(--un-shadow-color, rgb(0 0 0 / 0.1)) !important;box-shadow:var(--un-ring-offset-shadow), var(--un-ring-shadow), var(--un-shadow)!important;}
 .shadow-_lfl_0_-4px_12px_rgba_lbl_0_lco_0_lco_0_lco_0_dl_05_lbr__lfr_{--un-shadow:0 -4px 12px var(--un-shadow-color, rgba(0, 0, 0, 0.05));box-shadow:var(--un-ring-offset-shadow), var(--un-ring-shadow), var(--un-shadow);}
-.shadow-blue-200{--un-shadow-opacity:1;--un-shadow-color:rgb(191 219 254 / var(--un-shadow-opacity)) /* #bfdbfe */;}
 .shadow-inner{--un-shadow:inset 0 2px 4px 0 var(--un-shadow-color, rgb(0 0 0 / 0.05));box-shadow:var(--un-ring-offset-shadow), var(--un-ring-shadow), var(--un-shadow);}
 .shadow-lg{--un-shadow:var(--un-shadow-inset) 0 10px 15px -3px var(--un-shadow-color, rgb(0 0 0 / 0.1)),var(--un-shadow-inset) 0 4px 6px -4px var(--un-shadow-color, rgb(0 0 0 / 0.1));box-shadow:var(--un-ring-offset-shadow), var(--un-ring-shadow), var(--un-shadow);}
 .shadow-sm{--un-shadow:var(--un-shadow-inset) 0 1px 2px 0 var(--un-shadow-color, rgb(0 0 0 / 0.05));box-shadow:var(--un-ring-offset-shadow), var(--un-ring-shadow), var(--un-shadow);}
+.shadow-teal-200{--un-shadow-opacity:1;--un-shadow-color:rgb(153 246 228 / var(--un-shadow-opacity)) /* #99f6e4 */;}
 .backdrop-blur-md{--un-backdrop-blur:blur(24rpx);-webkit-backdrop-filter:var(--un-backdrop-blur) var(--un-backdrop-brightness) var(--un-backdrop-contrast) var(--un-backdrop-grayscale) var(--un-backdrop-hue-rotate) var(--un-backdrop-invert) var(--un-backdrop-opacity) var(--un-backdrop-saturate) var(--un-backdrop-sepia);backdrop-filter:var(--un-backdrop-blur) var(--un-backdrop-brightness) var(--un-backdrop-contrast) var(--un-backdrop-grayscale) var(--un-backdrop-hue-rotate) var(--un-backdrop-invert) var(--un-backdrop-opacity) var(--un-backdrop-saturate) var(--un-backdrop-sepia);}
 .blur-xl{--un-blur:blur(48rpx);-webkit-filter:var(--un-blur) var(--un-brightness) var(--un-contrast) var(--un-drop-shadow) var(--un-grayscale) var(--un-hue-rotate) var(--un-invert) var(--un-saturate) var(--un-sepia);filter:var(--un-blur) var(--un-brightness) var(--un-contrast) var(--un-drop-shadow) var(--un-grayscale) var(--un-hue-rotate) var(--un-invert) var(--un-saturate) var(--un-sepia);}
 .transition{transition-property:color,background-color,border-color,-webkit-text-decoration-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,-webkit-filter,filter,-webkit-backdrop-filter,backdrop-filter;transition-duration:.15s;transition-timing-function:cubic-bezier(.4,0,.2,1);}

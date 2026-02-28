@@ -43,7 +43,14 @@
             </view>
           </view>
         </block>
-        <!-- 否则回退显示持有收益率 (兼容异常情况) -->
+        <!-- 否则如果是关注基金，仅显示实时收益率 -->
+        <block wx:elif="{{ fund.isWatchOnly }}">
+          <view
+            class="text-36rpx font-bold font-numeric {{ fund.percentageChangeRaw >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
+            {{ fund.percentageChangeRaw >= 0 ? '+' : '' }}{{ fund.percentageChange }}%
+          </view>
+        </block>
+        <!-- 否则回退显示 -- (兼容异常情况) -->
         <block wx:else>
           <view class="text-36rpx font-bold font-numeric text-hex-D1D5DB">--</view>
         </block>
@@ -58,7 +65,12 @@
       <!-- 持有市值 -->
       <view class="flex-1 flex flex-col gap-4rpx">
         <view class="text-20rpx text-hex-9CA3AF">持有市值</view>
-        <view class="text-26rpx font-bold font-numeric text-hex-1F2937">¥{{ fund.holdingAmount }}</view>
+        <block wx:if="{{ fund.isWatchOnly }}">
+          <view class="text-26rpx font-bold font-numeric text-hex-D1D5DB">--</view>
+        </block>
+        <block wx:else>
+          <view class="text-26rpx font-bold font-numeric text-hex-1F2937">¥{{ fund.holdingAmount }}</view>
+        </block>
       </view>
 
       <view class="w-1px h-24rpx bg-hex-E5E7EB mx-16rpx"></view>
@@ -66,15 +78,20 @@
       <!-- 持有收益 -->
       <view class="flex-1 flex flex-col gap-4rpx">
         <view class="text-20rpx text-hex-9CA3AF">持有收益</view>
-        <view class="flex items-baseline gap-8rpx">
-          <view
-            class="text-26rpx font-bold font-numeric {{ fund.holdingProfitAmount >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
-            {{ fund.holdingProfitAmountRaw >= 0 ? '+' : '' }}{{ fund.holdingProfitAmount }}
+        <block wx:if="{{ fund.isWatchOnly }}">
+          <view class="text-26rpx font-bold font-numeric text-hex-D1D5DB">--</view>
+        </block>
+        <block wx:else>
+          <view class="flex items-baseline gap-8rpx">
+            <view
+              class="text-26rpx font-bold font-numeric {{ fund.holdingProfitAmountRaw >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
+              {{ fund.holdingProfitAmountRaw >= 0 ? '+' : '' }}{{ fund.holdingProfitAmount }}
+            </view>
+            <view class="text-20rpx {{ fund.holdingProfitRateRaw >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
+              {{ fund.holdingProfitRateRaw >= 0 ? '+' : '' }}{{ fund.holdingProfitRate }}%
+            </view>
           </view>
-          <view class="text-20rpx {{ fund.holdingProfitRateRaw >= 0 ? 'text-hex-EF4444' : 'text-hex-22C55E' }}">
-            {{ fund.holdingProfitRateRaw >= 0 ? '+' : '' }}{{ fund.holdingProfitRate }}%
-          </view>
-        </view>
+        </block>
       </view>
     </view>
   </view>

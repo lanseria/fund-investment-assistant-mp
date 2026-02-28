@@ -33,9 +33,19 @@ Page({
     fullHistory: [],
     chartData: [],
     chartLoading: false,
-    chartSelection: null,
     performanceItems: [],
-    showTradeSheet: false
+    showTradeSheet: false,
+    
+    // 交易相关
+    tradeForm: {
+      type: 'buy',
+      amountOrShares: '',
+      date: dayjs().format('YYYY-MM-DD')
+    },
+    showDatePicker: false,
+    currentDate: new Date().getTime(),
+    maxDate: new Date().getTime(),
+    submitting: false
   },
 
   onLoad(options) {
@@ -217,48 +227,12 @@ Page({
     ctx.stroke();
   },
 
-  onChartTouch(e) {
-    if (!this.chartCtx) return;
-    const { x } = e.touches[0];
-    const { width, height, data, scaleX, scaleY, ctx } = this.chartCtx;
-    let index = Math.round((x / width) * (data.length - 1));
-    index = Math.max(0, Math.min(index, data.length - 1));
-    const target = data[index];
-    const targetX = scaleX(index);
-    const targetY = scaleY(target.nav);
-
-    this.drawChartFrame(ctx, data, width, height);
-    ctx.save();
-    ctx.beginPath();
-    ctx.setLineDash([4, 4]);
-    ctx.strokeStyle = '#9CA3AF';
-    ctx.lineWidth = 1;
-    ctx.moveTo(targetX, 0);
-    ctx.lineTo(targetX, height);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(targetX, targetY, 4, 0, 2 * Math.PI);
-    ctx.fillStyle = '#EF4444';
-    ctx.fill();
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.restore();
-
-    this.setData({
-      chartSelection: {
-        date: dayjs(target.date).format('YYYY-MM-DD'),
-        nav: Number(target.nav).toFixed(4)
+  scheduleChartRedraw() {
+    setTimeout(() => {
+      if (this.data.fullHistory && this.data.fullHistory.length) {
+        this.updateChartData(this.data.activeRange);
       }
-    });
-  },
-
-  onChartTouchEnd() {
-    if (this.chartCtx) {
-      const { ctx, data, width, height } = this.chartCtx;
-      this.drawChartFrame(ctx, data, width, height);
-    }
-    this.setData({ chartSelection: null });
+    }, 150);
   },
 
   onRangeChange(e) {
@@ -268,6 +242,74 @@ Page({
     this.updateChartData(range);
   },
 
-  openTradeSheet() { this.setData({ showTradeSheet: true }); },
-  closeTradeSheet() { this.setData({ showTradeSheet: false }); }
+  // --- 交易管理 ---
+  openTradeSheet() { 
+    this.setData({ showTradeSheet: true }); 
+  },
+  
+  closeTradeSheet() { 
+    this.setData({ showTradeSheet: false }); 
+    this.scheduleChartRedraw();
+  },
+
+  onTradeTypeChange(e) {
+    this.setData({ 'tradeForm.type': e.detail });
+  },
+
+  openDatePicker() {
+    const current = this.data.tradeForm.date ? dayjs(this.data.tradeForm.date).valueOf() : new Date().getTime();
+    this.setData({ showDatePicker: true, currentDate: current });
+  },
+
+  closeDatePicker() {
+    this.setData({ showDatePicker: false });
+  },
+
+  onDateConfirm(e) {
+    this.setData({
+      'tradeForm.date': dayjs(e.detail).format('YYYY-MM-DD'),
+      showDatePicker: false
+    });
+  },
+
+  async submitTransaction() {
+    const { type, amountOrShares, date } = this.data.tradeForm;
+    if (!amountOrShares || Number(amountOrShares) <= 0) {
+      wx.showToast({ title: type === 'buy' ? '请输入有效的买入金额' : '请输入有效的卖出份额', icon: 'none' });
+      return;
+    }
+
+    this.setData({ submitting: true });
+    try {
+      const payload = {
+        fundCode: this.data.code,
+        type,
+        date
+      };
+      if (type === 'buy') {
+        payload.amount = Number(amountOrShares);
+      } else {
+        payload.shares = Number(amountOrShares);
+      }
+
+      await request({
+        url: '/fund/transactions',
+        method: 'POST',
+        data: payload
+      });
+
+      wx.showToast({ title: '提交成功', icon: 'success' });
+      
+      // 清空表单并关闭弹窗
+      this.setData({
+        'tradeForm.amountOrShares': '',
+        showTradeSheet: false
+      });
+      this.scheduleChartRedraw();
+    } catch (err) {
+      console.error('提交交易失败', err);
+    } finally {
+      this.setData({ submitting: false });
+    }
+  }
 });

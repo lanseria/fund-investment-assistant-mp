@@ -7,9 +7,3 @@
 .grid-cols-3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
-
-/* 解决 Canvas 在 ScrollView 中触摸时导致页面滚动的冲突 */
-/* 在 Canvas 容器上使用 overflow: hidden 有时能帮助 */
-canvas {
-  touch-action: none; /* 关键：阻止浏览器默认滚动行为 */
-}

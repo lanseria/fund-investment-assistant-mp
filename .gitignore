@@ -4,3 +4,4 @@ env.js
 .DS_Store
 ai/project_context.xml
 .claude
+docs
