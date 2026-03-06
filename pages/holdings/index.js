@@ -191,34 +191,7 @@ Page({
   },
 
   toDetail(e) {
-    // 兼容两种方式：直接点击(currentTarget) 或 组件事件(detail)
     const code = e.detail.code || e.currentTarget.dataset.code;
-
-    // 1. 从原始数据中查找，以获取未经格式化的数值
-    const rawItem = this.data.holdingsRaw.find(item => item.code === code);
-
-    if (rawItem) {
-      // 2. 构造精简的负载对象 (只传详情页需要的字段)
-      const payload = {
-        name: rawItem.name,
-        code: rawItem.code,
-        sector: rawItem.sector, // 原始板块值，用于在详情页转义
-        holdingAmount: rawItem.holdingAmount, // 原始数值
-        percentageChange: rawItem.percentageChange,
-        holdingProfitRate: rawItem.holdingProfitRate,
-        // 优先取今日估值 NAV，没有则取昨日 NAV
-        nav: rawItem.todayEstimateNav || rawItem.yesterdayNav,
-        isEstimateRealtime: !!rawItem.todayEstimateNav
-      };
-
-      // 3. 序列化对象
-      const dataStr = encodeURIComponent(JSON.stringify(payload));
-
-      // 4. 跳转
-      wx.navigateTo({ url: `/pages/fund/detail/index?code=${code}&data=${dataStr}` });
-    } else {
-      // 容错处理
-      wx.navigateTo({ url: `/pages/fund/detail/index?code=${code}` });
-    }
+    wx.navigateTo({ url: `/pages/fund/detail/index?code=${code}` });
   }
 });

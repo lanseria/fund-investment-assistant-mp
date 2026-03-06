@@ -61,7 +61,7 @@ Page({
 
     if (options.code) {
       this.setData({ code: options.code });
-      // 2. 异步加载剩余数据 (图表 + 业绩)
+      // 2. 异步加载剩余数据 (持仓详情 + 图表 + 业绩)
       this.initAsyncData(options.code);
     }
   },
@@ -112,18 +112,83 @@ Page({
     });
   },
 
-  // --- 异步加载数据 (图表 & 业绩) ---
+  // --- 异步加载数据 (持仓详情 + 图表 & 业绩) ---
   async initAsyncData(code) {
     // 这里不再设置 this.setData({ loading: true })，以免覆盖掉已经渲染出的头部信息
     // 仅在图表区域显示加载态
     try {
       await Promise.all([
+        this.fetchHoldingDetail(code),
         this.fetchHistory(code),
         this.fetchPerformance(code)
       ]);
     } catch (err) {
       console.error(err);
     }
+  },
+
+  // --- 新增：获取持仓详细信息 ---
+  async fetchHoldingDetail(code) {
+    try {
+      const detail = await request({ 
+        url: `/fund/holdings/${code}/detail`, 
+        method: 'GET', 
+        noLoading: true 
+      });
+      
+      if (detail) {
+        this.initFromApiData(detail);
+      }
+    } catch (e) {
+      console.error('获取持仓详情失败', e);
+    }
+  },
+
+  // --- 新增：从 API 数据初始化视图 ---
+  initFromApiData(data) {
+    const holdingAmt = Number(data.holdingAmount || 0);
+    const percent = Number(data.percentageChange || 0);
+
+    // 计算预估盈亏: 持仓金额 * 涨跌幅%
+    const estProfit = holdingAmt > 0
+      ? new Big(holdingAmt).times(percent).div(100).toFixed(2)
+      : '0.00';
+
+    const isUp = percent >= 0;
+
+    // 颜色样式计算
+    const colorSet = isUp ? {
+      hex: '#EF4444',
+      text: 'text-hex-EF4444',
+      bg: 'bg-hex-EF4444',
+      lightBg: 'bg-hex-FEF2F2'
+    } : {
+      hex: '#22C55E',
+      text: 'text-hex-22C55E',
+      bg: 'bg-hex-22C55E',
+      lightBg: 'bg-hex-F0FDF4'
+    };
+
+    // 使用今日估算净值或昨日净值
+    const nav = data.todayEstimateNav || data.yesterdayNav || 0;
+    const isEstimateRealtime = !!data.todayEstimateNav;
+
+    this.setData({
+      hasHolding: holdingAmt > 0,
+      estimatedDayProfit: formatCurrency(estProfit),
+      changeColorClass: colorSet,
+      holding: {
+        name: data.name,
+        code: data.code,
+        sectorLabel: getDictLabel('sectors', data.sector),
+        percentageChange: percent.toFixed(2),
+        holdingAmount: formatCurrency(holdingAmt),
+        holdingProfitRate: data.holdingProfitRate ? Number(data.holdingProfitRate).toFixed(2) : '0.00',
+        currentNav: new Big(nav).toFixed(4),
+        isEstimateRealtime
+      },
+      loading: false
+    });
   },
 
 
