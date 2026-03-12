@@ -44,8 +44,7 @@
     </view>
 
     <!-- 空状态 -->
-    <view wx:elif="{{ !groupedTransactions.length }}"
-      class="flex flex-col items-center justify-center pt-120rpx opacity-60">
+    <view wx:elif="{{ !userList.length }}" class="flex flex-col items-center justify-center pt-120rpx opacity-60">
       <view class="w-160rpx h-160rpx bg-hex-E5E7EB rounded-full flex items-center justify-center mb-32rpx">
         <van-icon name="description" size="48px" color="#9CA3AF" />
       </view>
@@ -56,68 +55,58 @@
       </view>
     </view>
 
-    <!-- 列表流 (LazyVStack 风格) -->
-    <view wx:else class="flex flex-col gap-40rpx pb-60rpx">
-      <view wx:for="{{ groupedTransactions }}" wx:for-item="group" wx:key="username" class="flex flex-col gap-24rpx">
+    <!-- 用户列表 -->
+    <view wx:else class="flex flex-col gap-24rpx pb-60rpx">
+      <view wx:for="{{ userList }}" wx:key="index"
+        class="bg-white rounded-32rpx p-32rpx shadow-sm active:scale-98 transition-transform" bindtap="goToDetail"
+        data-user-id="{{ item.user.id }}">
 
-        <!-- 分组标题 (Section Header) -->
-        <view class="flex items-center justify-between px-8rpx">
+        <!-- 用户信息行 -->
+        <view class="flex items-center justify-between mb-24rpx">
           <view class="flex items-center gap-16rpx">
-            <van-icon name="manager" color="#3B82F6" size="20px" />
-            <view class="text-30rpx font-bold text-hex-1F2937">{{ group.user.username }}</view>
-            <view wx:if="{{ group.user.isAiAgent }}"
-              class="bg-hex-EFF6FF text-hex-3B82F6 text-18rpx px-8rpx py-2rpx rounded border border-hex-DBEAFE">AI
+            <view class="w-88rpx h-88rpx bg-hex-EFF6FF rounded-full flex items-center justify-center flex-shrink-0">
+              <van-icon name="manager" color="#3B82F6" size="24px" />
+            </view>
+            <view class="flex flex-col gap-4rpx">
+              <view class="flex items-center gap-12rpx">
+                <view class="text-30rpx font-bold text-hex-1F2937">{{ item.user.username }}</view>
+                <view wx:if="{{ item.user.isAiAgent }}"
+                  class="bg-gradient-to-br from-hex-3B82F6 to-hex-A855F7 text-white text-18rpx px-10rpx py-2rpx rounded-full shadow-sm">
+                  AI
+                </view>
+              </view>
+              <view wx:if="{{ item.user.stats }}" class="text-24rpx text-hex-6B7280">
+                总资产 {{ item.user.stats.totalAssets }}
+              </view>
             </view>
           </view>
-          <view class="bg-hex-F3F4F6 text-hex-6B7280 text-20rpx px-12rpx py-4rpx rounded-8rpx font-medium">
-            {{ group.txs.length }} 笔操作
+          <van-icon name="arrow" color="#D1D5DB" size="16px" />
+        </view>
+
+        <!-- 统计数据行 -->
+        <view class="flex items-center gap-32rpx">
+          <view class="flex items-center gap-8rpx">
+            <view class="text-32rpx font-bold text-hex-1F2937">{{ item.counts.total }}</view>
+            <view class="text-22rpx text-hex-6B7280">笔</view>
+          </view>
+          <view class="flex items-center gap-8rpx">
+            <view class="w-16rpx h-16rpx rounded-full bg-hex-EF4444"></view>
+            <view class="text-24rpx text-hex-6B7280">买 {{ item.counts.buy }}</view>
+          </view>
+          <view class="flex items-center gap-8rpx">
+            <view class="w-16rpx h-16rpx rounded-full bg-hex-22C55E"></view>
+            <view class="text-24rpx text-hex-6B7280">卖 {{ item.counts.sell }}</view>
+          </view>
+          <view class="flex items-center gap-8rpx">
+            <view class="w-16rpx h-16rpx rounded-full bg-hex-F59E0B"></view>
+            <view class="text-24rpx text-hex-6B7280">待确认 {{ item.counts.pending }}</view>
           </view>
         </view>
 
-        <!-- 卡片列表 -->
-        <view class="flex flex-col gap-24rpx">
-          <view wx:for="{{ group.txs }}" wx:for-item="tx" wx:key="id"
-            class="bg-white rounded-32rpx p-32rpx shadow-sm flex items-center justify-between active:scale-98 transition-transform">
-
-            <!-- 左侧：图标 + 信息 -->
-            <view class="flex items-center gap-24rpx flex-1 min-w-0 mr-16rpx">
-              <!-- 圆形图标底座 -->
-              <view
-                class="w-96rpx h-96rpx rounded-full {{ tx.theme.bg }} flex items-center justify-center flex-shrink-0">
-                <van-icon name="{{ tx.theme.icon }}" color="{{ tx.theme.hex }}" size="20px" />
-              </view>
-
-              <!-- 中间文本 -->
-              <view class="flex flex-col gap-8rpx flex-1 min-w-0">
-                <view class="text-30rpx font-bold text-hex-1F2937 truncate">{{ tx.fundName || tx.fundCode }}</view>
-
-                <view class="flex items-center gap-12rpx">
-                  <!-- 类型标签 -->
-                  <view
-                    class="text-20rpx font-bold px-10rpx py-4rpx rounded-8rpx {{ tx.theme.bg }} {{ tx.theme.color }}">
-                    {{ tx.theme.label }}
-                  </view>
-
-                  <!-- 备注或时间 -->
-                  <view class="text-24rpx text-hex-9CA3AF truncate max-w-200rpx">
-                    {{ tx.note || tx.time }}
-                  </view>
-                </view>
-              </view>
-            </view>
-
-            <!-- 右侧：金额 + 状态 -->
-            <view class="flex flex-col items-end gap-4rpx flex-shrink-0">
-              <view class="text-34rpx font-bold font-numeric {{ tx.theme.color }}">
-                {{ tx.mainUnit === '¥' ? '¥' : '' }}{{ tx.mainValue }}<text wx:if="{{ tx.mainUnit === '份' }}"
-                  class="text-24rpx ml-4rpx">份</text>
-              </view>
-              <view class="text-22rpx {{ tx.statusColor }}">
-                {{ tx.statusText }}
-              </view>
-            </view>
-
-          </view>
+        <!-- 处理中状态 -->
+        <view wx:if="{{ item.loading }}" class="mt-20rpx flex items-center gap-8rpx">
+          <van-loading color="#0D9488" size="16px" />
+          <view class="text-22rpx text-hex-0D9488">AI 处理中...</view>
         </view>
 
       </view>

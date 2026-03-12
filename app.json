@@ -2,6 +2,7 @@
   "pages": [
     "pages/holdings/index",
     "pages/daily-ops/index",
+    "pages/daily-ops/detail",
     "pages/leaderboard/index",
     "pages/profile/index",
     "pages/login/login",

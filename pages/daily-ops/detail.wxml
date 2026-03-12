@@ -1,0 +1,98 @@
+<view class="page-shell ui-page pb-40rpx min-h-screen relative">
+  <!-- 头部用户信息 -->
+  <view class="px-24rpx py-32rpx bg-white">
+    <view wx:if="{{ user }}" class="flex items-center gap-24rpx">
+      <view class="w-112rpx h-112rpx bg-hex-EFF6FF rounded-full flex items-center justify-center flex-shrink-0">
+        <van-icon name="manager" color="#3B82F6" size="36px" />
+      </view>
+      <view class="flex flex-col gap-8rpx flex-1 min-w-0">
+        <view class="flex items-center gap-12rpx">
+          <view class="text-36rpx font-bold text-hex-1F2937 truncate">{{ user.username }}</view>
+          <view wx:if="{{ user.isAiAgent }}"
+            class="bg-gradient-to-br from-hex-3B82F6 to-hex-A855F7 text-white text-20rpx px-10rpx py-2rpx rounded-full shadow-sm">
+            AI
+          </view>
+        </view>
+        <view class="text-26rpx text-hex-6B7280">共 {{ txs.length }} 笔操作</view>
+      </view>
+    </view>
+  </view>
+
+  <van-divider />
+
+  <!-- 内容区域 -->
+  <view class="px-24rpx mt-16rpx">
+    <!-- 加载中 -->
+    <view wx:if="{{ loading }}" class="flex flex-col items-center justify-center py-100rpx">
+      <van-loading color="#0D9488" size="32px" vertical>加载记录中...</van-loading>
+    </view>
+
+    <!-- 空状态 -->
+    <view wx:elif="{{ !txs.length }}"
+      class="flex flex-col items-center justify-center pt-120rpx opacity-60">
+      <view class="w-160rpx h-160rpx bg-hex-E5E7EB rounded-full flex items-center justify-center mb-32rpx">
+        <van-icon name="description" size="48px" color="#9CA3AF" />
+      </view>
+      <view class="text-30rpx text-hex-6B7280 font-medium">该日暂无操作记录</view>
+    </view>
+
+    <!-- 交易列表 -->
+    <view wx:else class="flex flex-col gap-24rpx pb-60rpx">
+      <view wx:for="{{ txs }}" wx:key="id"
+        class="bg-white rounded-32rpx p-32rpx shadow-sm flex items-center justify-between active:scale-98 transition-transform">
+
+        <!-- 左侧：图标 + 信息 -->
+        <view class="flex items-center gap-24rpx flex-1 min-w-0 mr-16rpx">
+          <!-- 圆形图标底座 -->
+          <view class="w-96rpx h-96rpx rounded-full {{ item.theme.bg }} flex items-center justify-center flex-shrink-0">
+            <van-icon name="{{ item.theme.icon }}" color="{{ item.theme.hex }}" size="20px" />
+          </view>
+
+          <!-- 中间文本 -->
+          <view class="flex flex-col gap-8rpx flex-1 min-w-0">
+            <view class="text-30rpx font-bold text-hex-1F2937 truncate">{{ item.fundName || item.fundCode }}</view>
+            <view class="text-24rpx text-hex-6B7280 truncate">
+              {{ item.fundSector ? item.fundSector.toUpperCase() : '' }}
+            </view>
+
+            <view class="flex items-center gap-12rpx">
+              <!-- 类型标签 -->
+              <view class="text-20rpx font-bold px-10rpx py-4rpx rounded-8rpx {{ item.theme.bg }} {{ item.theme.color }}">
+                {{ item.theme.label }}
+              </view>
+
+              <!-- 时间 -->
+              <view class="text-24rpx text-hex-9CA3AF">
+                {{ item.time }}
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 右侧：金额 + 状态 -->
+        <view class="flex flex-col items-end gap-4rpx flex-shrink-0">
+          <view class="text-34rpx font-bold font-numeric {{ item.theme.color }}">
+            {{ item.mainUnit === '¥' ? '¥' : '' }}{{ item.mainValue }}<text wx:if="{{ item.mainUnit === '份' }}"
+              class="text-24rpx ml-4rpx">份</text>
+          </view>
+          <view class="text-22rpx {{ item.statusColor }}">
+            {{ item.statusText }}
+          </view>
+          <!-- 确认信息 -->
+          <view wx:if="{{ item.status === 'confirmed' }}" class="text-20rpx text-hex-9CA3AF mt-8rpx">
+            <text wx:if="{{ item.confirmedNav }}">净值 {{ item.confirmedNav }}</text>
+            <text wx:if="{{ item.confirmedShares }}"> · {{ Number(item.confirmedShares).toFixed(2) }} 份</text>
+          </view>
+        </view>
+
+      </view>
+
+      <!-- 备注 -->
+      <view wx:if="{{ item.note }}" class="bg-hex-F9FAFB rounded-24rpx px-24rpx py-20rpx">
+        <view class="text-24rpx text-hex-6B7280">{{ item.note }}</view>
+      </view>
+    </view>
+  </view>
+
+  <van-toast id="van-toast" />
+</view>
